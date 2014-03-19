@@ -4,7 +4,7 @@ module.exports = {
     title: 'vacay',
     host: 'localhost',
     port: 80,
-    ssl: true,
+    ssl: false,
     tmp: '/home/deploy/vacay/shared/tmp',
     debug: false,
     
