@@ -17,7 +17,17 @@ module.exports = {
 
     log: {
 	level: 'info',
-	express_format: '[:date] ":method :url HTTP/:http-version" :status :res[content-length] - :response-time ms ":referrer" :remote-addr'
+	express_format: '[:date] ":method :url HTTP/:http-version" :status :res[content-length] - :response-time ms ":referrer" :remote-addr',
+	mail: {
+	    to: 'admin@vacay.io',
+	    host : 'smtp.gmail.com',
+	    port : 465,
+	    secure : true,
+	    username: 'admin@vacay.io',
+	    password: 'Danger1$',
+	    level: 'error',
+	    handleExceptions: true
+	}
     },
 
     mysql: {
