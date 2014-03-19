@@ -19,7 +19,7 @@ module.exports = {
 	level: 'info',
 	express_format: '[:date] ":method :url HTTP/:http-version" :status :res[content-length] - :response-time ms ":referrer" :remote-addr',
 	file: {
-	    filename: '/home/admin/vacay/shared/log/default.log',
+	    filename: '/home/deploy/vacay/shared/log/default.log',
 	    level: 'info',
 	    maxsize: 10485760,
 	    maxFiles: 1,
@@ -38,7 +38,7 @@ module.exports = {
     },
 
     mysql: {
-	host: 'vcy.c5bdxy9dsboj.us-east-1.rds.amazonaws.com',
+	host: 'ip-172-31-17-201.ec2.internal',
 	port: 3306,
 	database: 'vacay_production',
 	user: 'root',
@@ -46,7 +46,7 @@ module.exports = {
     },
 
     redis: {
-	host: 'ec2-54-205-176-7.compute-1.amazonaws.com',
+	host: 'ip-172-31-31-5.ec2.internal',
 	port: 6379,
 	pass: 'Danger1$'
     },

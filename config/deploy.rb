@@ -1,35 +1,30 @@
+# config valid only for Capistrano 3.1
+lock '3.1.0'
+
 set :application, 'vacay'
-set :repo_url, 'git@github.com:vacay/vacay.git'
+set :repo_url, 'git@github.com:vacay/api.git'
 
-set :deploy_to, '/home/t3rr0r/vacay'
-set :scm, :git
-
-set :format, :pretty
-set :log_level, :debug
+set :deploy_to, '/home/deploy/vacay'
 set :pty, true
+
+# Default value for :linked_files is []
+# set :linked_files, %w{config/database.yml}
+
+# Default value for linked_dirs is []
+# set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
 
 set :default_env, { 'NODE_ENV' => 'production' }
 set :keep_releases, 2
 
-set :rubygems_version, '2.1.7'
 set :use_sudo, true
-
-ec2_role :api, type: 'api', script_path: 'api/app.js'
-ec2_role :worker, type: 'worker', script_path: 'worker/app.js'
-ec2_role :monitor, type: 'monitor'
-ec2_role :search, type: 'search'
 
 namespace :deploy do
   after :updated, :npm_refresh_symlink
-  after :updated, :assets_refresh_symlink
   after :updated, :npm_install
-  after :updated, :worker_update_youtubedl
-  after :updated, :assets
-  
+
   desc 'Restart node script'
   after :publishing, :restart do
     invoke :forever_stop
-    invoke :worker_clean_tmp
     invoke :clean_logs
     sleep 3
     invoke :forever_start

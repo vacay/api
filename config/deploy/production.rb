@@ -1,8 +1,6 @@
-set :stage, :production
-
-set :ssh_options, {
+server 'ec2-54-85-150-127.compute-1.amazonaws.com', roles: %w{api}, ssh_options: {
+  user: 'deploy', # overrides user setting above
   forward_agent: true,
-  user: 't3rr0r'
+  auth_methods: %w(publickey)
+  # password: 'please use keys'
 }
-
-set :filter, :roles => %w{api worker}
