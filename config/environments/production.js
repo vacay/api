@@ -5,7 +5,7 @@ module.exports = {
     host: 'localhost',
     port: 80,
     ssl: true,
-    tmp: '/home/admin/vacay/shared/tmp',
+    tmp: '/home/deploy/vacay/shared/tmp',
     debug: false,
     
     s3: {
@@ -17,24 +17,7 @@ module.exports = {
 
     log: {
 	level: 'info',
-	express_format: '[:date] ":method :url HTTP/:http-version" :status :res[content-length] - :response-time ms ":referrer" :remote-addr',
-	file: {
-	    filename: '/home/deploy/vacay/shared/log/default.log',
-	    level: 'info',
-	    maxsize: 10485760,
-	    maxFiles: 1,
-	    handleExceptions: true
-	},
-	mail: {
-	    to: 'admin@vacay.io',
-	    host : 'smtp.gmail.com',
-	    port : 465,
-	    secure : true,
-	    username: 'admin@vacay.io',
-	    password: 'Danger1$',
-	    level: 'error',
-	    handleExceptions: true
-	}
+	express_format: '[:date] ":method :url HTTP/:http-version" :status :res[content-length] - :response-time ms ":referrer" :remote-addr'
     },
 
     mysql: {

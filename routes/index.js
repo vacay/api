@@ -176,6 +176,10 @@ module.exports = function (app) {
 	    vitamin.load,
 	    vitamin.pages);
 
+    app.get('/health_check', function(req, res) {
+	res.send(200);
+    });
+
     app.get('*', function (req, res) {
 	res.send(404, {
 	    message: 'invalid endpoint: ' + req.url,
