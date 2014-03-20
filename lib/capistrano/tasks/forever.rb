@@ -19,3 +19,9 @@ task :forever_start do
     execute "sudo NODE_ENV=production forever start -s #{release_path}/app.js"
   end
 end
+
+task :forever_cleanlogs do
+  on roles(:api), in: :parallel do
+    execute "sudo forever cleanlogs"
+  end
+end

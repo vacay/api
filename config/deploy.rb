@@ -26,6 +26,7 @@ namespace :deploy do
   after :publishing, :restart do
     invoke :forever_stop
     invoke :clean_logs
+    invoke :forever_cleanlogs
     sleep 3
     invoke :forever_start
   end

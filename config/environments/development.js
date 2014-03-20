@@ -12,7 +12,7 @@ module.exports = {
     s3: {
 	key: 'AKIAJNZCI6UWMG3BNCVA',
 	secret: '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',
-	bucket: 'vcy',
+	bucket: 'vacay',
 	folder: 'development'
     },
 

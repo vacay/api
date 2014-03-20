@@ -6,6 +6,10 @@
 *.pid
 *.gz
 *.DS_Store
+*.crt
+*.key
+*.pem
+*.csr
 
 .env
 lib-cov
