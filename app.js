@@ -72,20 +72,21 @@ var startApp = function () {
     });
 };
 
-var startCluster = function (onWorker, onDeath) {
+var startCluster = function (onWorker, onExit) {
     if (cluster.isMaster) {
 	log.info('Initializing ' + os.cpus().length + ' workers in this cluster.');
 	for (var i = 0; i < os.cpus().length; i++) {
 	    cluster.fork();
 	}
-	cluster.on('death', onDeath);
+	cluster.on('exit', onExit);
     } else {
 	onWorker();
     }
 };
 
-/*startCluster(startApp, function (worker) {
-    log.error('worker ' + worker.pid + ' died');
-});*/
+var workerDeath = function(worker, code, signal) {
+    log.info('worker %d died, code (%s). restarting worker...', worker.process.pid, code);
+    cluster.fork();
+};
 
-startApp();
+startCluster(startApp, workerDeath);
