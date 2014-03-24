@@ -84,9 +84,9 @@ var startCluster = function (onWorker, onExit) {
     }
 };
 
-var workerDeath = function(worker, code, signal) {
+var restartApp = function(worker, code, signal) {
     log.info('worker %d died, code (%s). restarting worker...', worker.process.pid, code);
     cluster.fork();
 };
 
-startCluster(startApp, workerDeath);
+startCluster(startApp, restartApp);
