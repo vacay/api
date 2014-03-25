@@ -8,6 +8,7 @@ module.exports = {
     ssl: false,
     tmp: path.join(__dirname, '/../../tmp'),
     debug: true,
+    mailgun: 'key-3565e5ul9xwr-ir8c4n3f4ud7ur59dp8',
     
     s3: {
 	key: 'AKIAJNZCI6UWMG3BNCVA',

@@ -22,7 +22,8 @@
 	"async": "0.2.10",
 	"uuid": "1.4.1",
 	"moment": "2.5.1",
-	"log": "https://api.github.com/repos/vacay/log/tarball/master"
+	"log": "https://api.github.com/repos/vacay/log/tarball/master",
+	"mailgun": "0.4.2"
     },
     "engines": {
 	"node": "0.10.x",

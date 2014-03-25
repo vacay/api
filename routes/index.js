@@ -3,6 +3,7 @@
 var auth = require('./auth'),
     path = require('path'),
     me = require('./me'),
+    message = require('./message'),
     page = require('./page'),
     user = require('./user'),
     prescription = require('./prescription'),
@@ -86,6 +87,10 @@ module.exports = function (app) {
 	    hasParams(['title']),
 	    isAuthenticated,
 	    me.upload);
+
+    app.post('/v1/message',
+	     hasParams(['name', 'email', 'subject', 'body']),
+	     message.create);
 
     app.post('/v1/page',
 	     hasParams(['url']),
