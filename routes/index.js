@@ -127,7 +127,7 @@ module.exports = function (app) {
 
     app.put('/v1/user/:user',
 	    isAuthenticated,
-	    hasParams(['name', 'bio', 'location', 'avatar']),
+	    hasParams(['name', 'bio', 'location']),
 	    user.load,
 	    user.update); 
 
