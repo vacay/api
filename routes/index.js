@@ -85,7 +85,7 @@ module.exports = function (app) {
 
     app.get('/v1/me/drafts',
 	    isAuthenticated,
-	    prescription.drafts);
+	    me.drafts);
 
     app.post('/v1/me/upload',
 	    hasParams(['title']),

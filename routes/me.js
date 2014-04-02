@@ -90,8 +90,31 @@ var upload = function(req, res) {
     });
 };
 
+var drafts = function(req, res) {
+    var offset = req.param('offset') || 0;
+    db.model('Prescription')
+	.collection()
+	.query(function(qb) {
+	    qb.whereNull('published_at').andWhere('prescriber_id', req.user.id).limit(20).offset(offset).orderBy('updated_at', 'desc');
+	})
+	.fetch({
+	    withRelated: [
+		'prescriber',
+		'vitamins',
+		'vitamins.hosts'
+	    ]
+	}).exec(function(err, prescriptions) {
+	    if (err) log.error(err);
+	    res.send(err ? 500 : 200, {
+		session: req.user,
+		data: err ? err : prescriptions.toJSON()
+	    });
+	});
+};
+
 module.exports = {
     index: index,
     inbox: inbox,
-    upload: upload
+    upload: upload,
+    drafts: drafts
 };
