@@ -83,6 +83,10 @@ module.exports = function (app) {
 	    isAuthenticated,
 	    me.inbox);
 
+    app.get('/v1/me/drafts',
+	    isAuthenticated,
+	    prescription.drafts);
+
     app.post('/v1/me/upload',
 	    hasParams(['title']),
 	    isAuthenticated,
@@ -108,18 +112,20 @@ module.exports = function (app) {
     //TODO: validate vitamin length
     app.post('/v1/prescription',
 	     isAuthenticated,
-	     hasParams(['description', 'vitamins', 'image']),
 	     prescription.create);
 
     app.get('/v1/prescription/:prescription',
 	    prescription.load,
 	    prescription.read);
 
+    app.post('/v1/prescription/:prescription/publish',
+	     isAuthenticated,
+	     prescription.publish);
+
     //TODO: validate vitamins to make sure they exist
     //TODO: validate vitamin length
     app.put('/v1/prescription/:prescription',
 	    isAuthenticated,
-	    hasParams(['description', 'vitamins']),
 	    prescription.update);
 
     app.del('/v1/prescription/:prescription',

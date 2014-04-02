@@ -31,7 +31,7 @@ var read = function(req, res) {
 	withRelated: [
 	    {
 		'prescriptions': function(qb) {
-		    qb.whereNull('recipient_id').limit(20).orderBy('prescriptions.created_at', 'desc');
+		    qb.whereNotNull('published_at').whereNull('recipient_id').limit(20).orderBy('prescriptions.published_at', 'desc');
 		}
 	    },
 	    'prescriptions.prescriber',
@@ -86,7 +86,8 @@ var subscribers = function(req, res) {
 var prescriptions = function(req, res) {
     var offset = req.param('offset') || 0;
     res.locals.user.prescriptions().query(function(qb) {
-	qb.whereNull('prescriptions.recipient_id')
+	qb.whereNotNull('published_at')
+	    .whereNull('prescriptions.recipient_id')
 	    .orderBy('prescriptions.created_at', 'desc')
 	    .limit(20)
 	    .offset(offset);
