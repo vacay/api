@@ -173,9 +173,14 @@ var browse = function(req, res) {
 		for(var i=0; i<hits.length; i++) {
 		    ids.push(hits[i]._source.id);
 		}
+		if (!ids.length) {
+		    callback(null, null);
+		    return;
+		}
 	    }
 
 	    if (ids && !Array.isArray(ids)) ids = [ids];
+
 	    db.model('Vitamin')
 		.collection()
 		.query(function(qb) {
@@ -194,7 +199,7 @@ var browse = function(req, res) {
 	if (err) log.error(err);
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err ? err : vitamins.toJSON()
+	    data: err || !vitamins ? err || [] : vitamins.toJSON()
 	});
     });
 };
