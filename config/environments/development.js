@@ -10,6 +10,12 @@ module.exports = {
     debug: true,
     mailgun: 'key-3565e5ul9xwr-ir8c4n3f4ud7ur59dp8',
     
+    elasticsearch: {
+	hosts: [
+	    'http://localhost:9200'
+	]
+    },
+
     s3: {
 	key: 'AKIAJNZCI6UWMG3BNCVA',
 	secret: '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',

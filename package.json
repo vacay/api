@@ -23,7 +23,8 @@
 	"uuid": "1.4.1",
 	"moment": "2.5.1",
 	"log": "vacay/log",
-	"mailgun": "0.4.2"
+	"mailgun": "0.4.2",
+	"elasticsearch": "2.1.1"
     },
     "engines": {
 	"node": "0.10.x",

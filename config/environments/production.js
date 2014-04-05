@@ -8,7 +8,13 @@ module.exports = {
     tmp: '/home/deploy/vacay/shared/tmp',
     debug: false,
     mailgun: 'key-3565e5ul9xwr-ir8c4n3f4ud7ur59dp8',
-    
+
+    elasticsearch: {
+	hosts: [
+	    'http://search.vacay.io'
+	]
+    },
+
     s3: {
 	key: 'AKIAJNZCI6UWMG3BNCVA',
 	secret: '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',

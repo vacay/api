@@ -132,6 +132,9 @@ module.exports = function (app) {
 	    isAuthenticated,
 	    prescription.destroy);
 
+    app.get('/v1/users',
+	    user.browse);
+
     app.get('/v1/user/:user',
 	    user.load,
 	    user.read);
@@ -159,6 +162,9 @@ module.exports = function (app) {
     app.get('/v1/user/:user/prescriptions',
 	    user.load,
 	    user.prescriptions);
+
+    app.get('/v1/vitamins',
+	    vitamin.browse);
 
     app.post('/v1/vitamin',
 	     isAuthenticated,

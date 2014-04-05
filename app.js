@@ -5,10 +5,13 @@ var express = require('express'),
     os = require('os'),
     config = require('config-api'),
     log = require('log')(config.log),
-    routes = require('./routes');
+    routes = require('./routes'),
+    elasticsearch = require('elasticsearch');
 
 var app = module.exports = express(),
     server = require('http').createServer(app);
+
+var es = new elasticsearch.Client(config.elasticsearch);
 
 app.configure(function () {
 
@@ -23,6 +26,7 @@ app.configure(function () {
     app.use(express.methodOverride());
 
     app.use(function (req, res, next) {
+	res.locals.es = es;
 	res.locals.env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development';
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');

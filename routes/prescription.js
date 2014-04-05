@@ -147,30 +147,62 @@ var destroy = function(req, res) {
 
 var browse = function(req, res) {
     var offset = req.param('offset') || 0;
-    var ids = req.param('ids'); //TODO: validate format
-    if (ids && !Array.isArray(ids)) ids = [ids];
-    db.model('Prescription')
-	.collection()
-	.query(function(qb) {
-	    if (ids) {
-		qb.whereIn('id', ids);
+    var query = req.param('q') || null;
+    var ids = req.param('ids') || [];
+
+    async.waterfall([
+
+	function(callback) {
+	    if (query) {
+		res.locals.es.search({
+		    index: 'vcy',
+		    type: 'prescriptions',
+		    q: query,
+		    size: 10
+		}, callback);
 	    } else {
-		qb.whereNotNull('published_at').limit(20).offset(offset).orderBy('published_at', 'desc');
+		callback(null, null, null);
 	    }
-	})
-	.fetch({
-	    withRelated: [
-		'prescriber',
-		'vitamins',
-		'vitamins.hosts'
-	    ]
-	}).exec(function(err, prescriptions) {
-	    if (err) log.error(err);
-	    res.send(err ? 500 : 200, {
-		session: req.user,
-		data: err ? err : prescriptions.toJSON()
-	    });
+	},
+
+	function(search, status, callback) {
+
+	    if (search) {
+		ids = [];
+		var hits = search.hits.hits;
+		for(var i=0; i<hits.length; i++) {
+		    ids.push(hits[i]._source.id);
+		}
+	    }
+	    if (ids && !Array.isArray(ids)) ids = [ids];
+	    db.model('Prescription')
+		.collection()
+		.query(function(qb) {
+		    if (ids.length) {
+			qb.whereIn('id', ids);
+		    } else {
+			qb.whereNotNull('published_at')
+			    .limit(20)
+			    .offset(offset)
+			    .orderBy('published_at', 'desc');
+		    }
+		})
+		.fetch({
+		    withRelated: [
+			'prescriber',
+			'vitamins',
+			'vitamins.hosts'
+		    ]
+		}).exec(callback);
+	}
+
+    ], function(err, prescriptions) {
+	if (err) log.error(err);
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err ? err : prescriptions.toJSON()
 	});
+    });
 };
 
 module.exports = {

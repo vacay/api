@@ -2,7 +2,8 @@
 
 var config = require('config-api'),
     log = require('log')(config.log),
-    db = require('db')(config);
+    db = require('db')(config),
+    async = require('async');
 
 var load = function(req, res, next) {
     db.model('User').findOne({
@@ -106,10 +107,64 @@ var prescriptions = function(req, res) {
     });
 };
 
+var browse = function(req, res) {
+    var offset = req.param('offset') || 0;
+    var query = req.param('q') || null;
+    var ids = req.param('ids');
+
+    async.waterfall([
+
+	function(callback) {
+	    if (query) {
+		res.locals.es.search({
+		    index: 'vcy',
+		    type: 'users',
+		    q: query,
+		    size: 5
+		}, callback);
+	    } else {
+		callback(null, null, null);
+	    }
+	},
+
+	function(search, status, callback) {
+
+	    if (search) {
+		ids = [];
+		var hits = search.hits.hits;
+		for(var i=0; i<hits.length; i++) {
+		    ids.push(hits[i]._source.id);
+		}
+	    }
+
+	    if (ids && !Array.isArray(ids)) ids = [ids];
+	    db.model('User')
+		.collection()
+		.query(function(qb) {
+		    if (ids.length) {
+			qb.whereIn('id', ids);
+		    } else {
+			qb.limit(20)
+			    .offset(offset)
+			    .orderBy('created_at', 'desc');
+		    }
+		}).fetch().exec(callback);
+	}
+
+    ], function(err, users) {
+	if (err) log.error(err);
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err ? err : users.toJSON()
+	});
+    });
+};
+
 module.exports = {
     load: load,
     read: read,
     update: update,
     subscribers: subscribers,
-    prescriptions: prescriptions
+    prescriptions: prescriptions,
+    browse: browse
 };

@@ -5,7 +5,6 @@ var config = require('config-api'),
     db = require('db')(config),
     async = require('async');
 
-
 var load = function(req, res, next) {
     db.model('Vitamin').findOne({
 	id: req.param('vitamin')
@@ -146,6 +145,60 @@ var pages = function(req, res) {
     });
 };
 
+var browse = function(req, res) {
+    var offset = req.param('offset') || 0;
+    var query = req.param('q') || null;
+    var ids = req.param('ids') || [];
+
+    async.waterfall([
+
+	function(callback) {
+	    if (query) {
+		res.locals.es.search({
+		    index: 'vcy',
+		    type: 'vitamins',
+		    q: query,
+		    size: 10
+		}, callback);
+	    } else {
+		callback(null, null, null);
+	    }
+	},
+
+	function(search, status, callback) {
+
+	    if (search) {
+		ids = [];
+		var hits = search.hits.hits;
+		for(var i=0; i<hits.length; i++) {
+		    ids.push(hits[i]._source.id);
+		}
+	    }
+
+	    if (ids && !Array.isArray(ids)) ids = [ids];
+	    db.model('Vitamin')
+		.collection()
+		.query(function(qb) {
+		    if (ids.length) {
+			qb.whereIn('id', ids);
+		    } else {
+			qb.limit(20)
+			    .offset(offset)
+			    .orderBy('created_at', 'desc');
+		    }
+		})
+		.fetch({ withRelated: ['hosts'] }).exec(callback);
+	}
+
+    ], function(err, vitamins) {
+	if (err) log.error(err);
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err ? err : vitamins.toJSON()
+	});
+    });
+};
+
 module.exports = {
     load: load,
     create: create,
@@ -153,5 +206,6 @@ module.exports = {
     update: update,
     prescriptions: prescriptions,
     pages: pages,
-    summary: summary
+    summary: summary,
+    browse: browse
 };
