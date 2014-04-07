@@ -110,7 +110,7 @@ var prescriptions = function(req, res) {
 var browse = function(req, res) {
     var offset = req.param('offset') || 0;
     var query = req.param('q') || null;
-    var ids = req.param('ids');
+    var ids = req.param('ids') || [];
 
     async.waterfall([
 
