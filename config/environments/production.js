@@ -11,7 +11,8 @@ module.exports = {
 
     elasticsearch: {
 	hosts: [
-	    'http://search.vacay.io'
+	    'ip-172-31-2-40.ec2.internal:9200',
+	    'ip-172-31-2-41.ec2.internal:9200'
 	]
     },
 
