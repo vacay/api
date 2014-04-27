@@ -204,6 +204,22 @@ var browse = function(req, res) {
     });
 };
 
+var sync = function(req, res) {
+    var ids = req.param('ids');
+    var last_synced_at = req.param('last_synced_at') || null;
+
+    db.model('Vitamin').collection().query(function(qb) {
+	qb.whereIn('id', ids);
+	if (last_synced_at) qb.andWhere('updated_at', '>', last_synced_at);
+    }).fetch({ withRelated: ['hosts'] }).exec(function(err, vitamins) {
+	if (err) log.error(err);
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err || !vitamins ? err || [] : vitamins.toJSON()
+	});
+    });
+};
+
 module.exports = {
     load: load,
     create: create,
@@ -212,5 +228,6 @@ module.exports = {
     prescriptions: prescriptions,
     pages: pages,
     summary: summary,
-    browse: browse
+    browse: browse,
+    sync: sync
 };

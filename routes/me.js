@@ -75,9 +75,9 @@ var policy = function() {
 var upload = function(req, res) {
     var p = policy(),
 	s = signature(p),
-	fileExt = req.param('title').split('.').pop(),
+	ext = req.param('ext'),
 	type = req.param('type'),
-	filename = req.user.id + '_' + uuid.v4() + '.' + fileExt,
+	filename = req.user.id + '_' + uuid.v4() + '.' + ext,
 	key = config.s3.folder + '/tmp/' + filename;
     
     res.send(200, { 

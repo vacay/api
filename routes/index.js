@@ -9,6 +9,7 @@ var auth = require('./auth'),
     prescription = require('./prescription'),
     subscription = require('./subscription'),
     vitamin = require('./vitamin'),
+    image = require('./image'),
     config = require('config-api'),
     log = require('log')(config.log),
     jwt = require('jsonwebtoken');
@@ -75,6 +76,11 @@ module.exports = function (app) {
 	     auth.signin,
 	     me.index);
 
+    app.get('/v1/image',
+	    isAuthenticated,
+	    hasParams(['url']),
+	    image.proxy);
+
     app.get('/v1/me',
 	    isAuthenticated,
 	    me.index);
@@ -88,7 +94,7 @@ module.exports = function (app) {
 	    me.drafts);
 
     app.post('/v1/me/upload',
-	    hasParams(['title']),
+	    hasParams(['ext']),
 	    isAuthenticated,
 	    me.upload);
 
@@ -165,6 +171,11 @@ module.exports = function (app) {
 
     app.get('/v1/vitamins',
 	    vitamin.browse);
+
+    app.get('/v1/vitamins/sync',
+	    isAuthenticated,
+	    hasParams(['ids']),
+	    vitamin.sync);
 
     app.post('/v1/vitamin',
 	     isAuthenticated,

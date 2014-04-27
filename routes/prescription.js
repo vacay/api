@@ -134,6 +134,7 @@ var update = function(req, res) {
 };
 
 var destroy = function(req, res) {
+    //TODO: delete vitamin relations too
     db.model('Prescription')
 	.destroy(req.param('prescription'))
 	.exec(function(err, prescription) {
