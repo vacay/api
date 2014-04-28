@@ -65,6 +65,15 @@ module.exports = function (app) {
     app.all('/v1/*',
 	    authenticate);
 
+    app.get('/v1/auth/reset',
+	    hasParams(['email']),
+	    auth.requestReset);
+
+    app.post('/v1/auth/reset',
+	     hasParams(['reset', 'email', 'password']),
+	     auth.reset,
+	     me.index);
+
     app.post('/v1/auth/signup',
 	     hasParams(['email', 'name', 'password', 'username']),
 	     auth.signup,

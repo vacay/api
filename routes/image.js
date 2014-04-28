@@ -5,6 +5,7 @@ var request = require('request'),
 
 var proxy = function(req, res) {
     //TODO: validate head for content-type to check if image
+    //TODO: and add a timeout
     req.pipe(request({
 	url: req.param('url'),
 	encoding: 'base64'

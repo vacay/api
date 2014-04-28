@@ -4,11 +4,25 @@ var path = require('path');
 module.exports = {
     title: 'vacay',
     host: 'localhost',
+    url: 'http://localhost:9000',
     port: 8000,
     ssl: false,
     tmp: path.join(__dirname, '/../../tmp'),
     debug: true,
     mailgun: 'key-3565e5ul9xwr-ir8c4n3f4ud7ur59dp8',
+
+    smtp: {
+	service: 'Gmail',
+	auth: {
+	    user: 'admin@vacay.io',
+	    pass: 'Danger1$'
+	}
+    },
+
+    reset: {
+	secret: 'AWRO7Na+EgvvBA==',
+	expires: 1440 //minutes
+    },
     
     elasticsearch: {
 	hosts: [
@@ -43,6 +57,6 @@ module.exports = {
     
     session: {
 	secret: 'hr{@"ca69EfN;*>J7wy:-yVs&^}]b1C]&96N|[[{^xb&<B>jp*%D[[7gEqaU]%Q}',
-	maxAge: 60
+	expires: 60 //minutes
     }
 };

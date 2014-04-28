@@ -6,12 +6,15 @@ var express = require('express'),
     config = require('config-api'),
     log = require('log')(config.log),
     routes = require('./routes'),
-    elasticsearch = require('elasticsearch');
+    elasticsearch = require('elasticsearch'),
+    nodemailer = require('nodemailer');
 
 var app = module.exports = express(),
     server = require('http').createServer(app);
 
 var es = new elasticsearch.Client(config.elasticsearch);
+
+var smtp = nodemailer.createTransport('SMTP', config.smtp);
 
 app.configure(function () {
 
@@ -27,6 +30,7 @@ app.configure(function () {
 
     app.use(function (req, res, next) {
 	res.locals.es = es;
+	res.locals.smtp = smtp;
 	res.locals.env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development';
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');

@@ -1,7 +1,8 @@
 /* global module, require */
 var config = require('config-api'),
     log = require('log')(config.log),
-    db = require('db')(config);
+    db = require('db')(config),
+    jwt = require('jsonwebtoken');
 
 module.exports.signin = function (req, res, next) {
     var email = req.param('email') || res.locals.email;
@@ -55,6 +56,83 @@ module.exports.signup = function (req, res, next) {
 	    res.locals.email = user.email;
 	    res.locals.password = user.password;
 	    next();
+	}
+    });
+};
+
+module.exports.reset = function(req, res, next) {
+    var resetToken = req.param('reset'),
+	email = req.param('email');
+
+    jwt.verify(resetToken, config.reset.secret, function(err, decoded) {
+	if (err) log.error(err.toString());
+	if (decoded.email !== email) {
+	    res.send(400, {
+		session: null,
+		data: 'Invalid email'
+	    });
+	    return;
+	}
+
+	db.model('User').findOne({
+	    email: email
+	}).then(function (user) {
+	    if (err) {
+		log.error(err);
+		res.send(400, {
+		    session: null,
+		    data: 'Please request a new reset password link'
+		});
+	    } else {
+		user.resetPassword(req.param('password'), function(err) {
+		    if (err) {
+			log.error(err);
+			res.send(500, {
+			    session: null,
+			    data: 'Unable to reset password'
+			});
+		    } else {
+			req.user = {
+			    id : user.id,
+			    username: user.attributes.username
+			};
+			next();
+		    }
+		});
+	    }
+	});
+    });
+};
+
+module.exports.requestReset = function(req, res) {
+    db.model('User').findOne({
+	email: req.param('email')
+    }).then(function (user) {
+	if (!user) {
+	    res.send(400, {
+		session: null,
+		data: 'Invalid email'
+	    });
+	} else {
+	    var token = jwt.sign({
+		email: user.attributes.email
+	    }, config.reset.secret, {
+		expiresInMinutes: config.reset.expires
+	    });
+	    var resetLink = config.url + '?reset=' + token;
+	    var mailOptions = {
+		from: 'Vacay <admin@vacay.io>',
+		to: user.attributes.name + ' <' + user.attributes.email + '>',
+		subject: 'vacay.io: password reset link',
+		html: 'Reset password: <a href="' + resetLink + '">' + resetLink + '</a>' 
+	    };
+	    res.locals.smtp.sendMail(mailOptions, function(err, data) {
+		if (err) log.error(err);
+		res.send(err ? 500 : 200, {
+		    session: null,
+		    data: err ? 'Failed to send link, try again later' : 'sent'
+		});
+	    });
 	}
     });
 };

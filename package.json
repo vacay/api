@@ -24,6 +24,7 @@
 	"moment": "2.5.1",
 	"log": "vacay/log",
 	"mailgun": "0.4.2",
+	"nodemailer": "0.6.3",
 	"request": "2.34.0",
 	"elasticsearch": "2.1.1"
     },
