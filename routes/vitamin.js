@@ -51,12 +51,12 @@ var summary = function(req, res) {
     ], function(err, users) {
 	if (err) log.error(err);
 
-	var user = res.locals.vitamin.toJSON();
-	user.users = users.toJSON();
+	var vitamin = res.locals.vitamin.toJSON();
+	vitamin.users = users.toJSON();
 
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err ? err : user
+	    data: err ? err : vitamin
 	});
     });
 };
@@ -78,10 +78,20 @@ var read = function(req, res) {
     res.locals.vitamin.fetch({
 	withRelated: [
 	    'hosts',
+	    {
+		'crates': function(qb) {
+		    qb.where('user_id', req.user.id);
+		}
+	    },
 	    'prescriptions',
 	    'prescriptions.prescriber',
 	    'prescriptions.vitamins',
-	    'prescriptions.vitamins.hosts'
+	    'prescriptions.vitamins.hosts',
+	    {
+		'prescriptions.vitamins.crates': function(qb) {
+		    qb.where('user_id', req.user.id);
+		}
+	    }
 	]
     }).exec(function(err, vitamin) {
 	if (err) log.error(err);
@@ -119,7 +129,12 @@ var prescriptions = function(req, res) {
 	    },
 	    'prescriptions.prescriber',
 	    'prescriptions.vitamins',
-	    'prescriptions.vitamins.hosts'
+	    'prescriptions.vitamins.hosts',
+	    {
+		'prescriptions.vitamins.crates': function(qb) {
+		    qb.where('user_id', req.user.id);
+		}
+	    }
 	]
     }).exec(function(err, vitamin) {
 	if (err) log.error(err);
@@ -192,7 +207,14 @@ var browse = function(req, res) {
 			    .orderBy('created_at', 'desc');
 		    }
 		})
-		.fetch({ withRelated: ['hosts'] }).exec(callback);
+		.fetch({ withRelated: [
+		    'hosts',
+		    {
+			'crates': function(qb) {
+			    qb.where('user_id', req.user.id);
+			}
+		    }
+		] }).exec(callback);
 	}
 
     ], function(err, vitamins) {

@@ -9,6 +9,7 @@ var auth = require('./auth'),
     prescription = require('./prescription'),
     subscription = require('./subscription'),
     vitamin = require('./vitamin'),
+    crate = require('./crate'),
     image = require('./image'),
     config = require('config-api'),
     log = require('log')(config.log),
@@ -93,6 +94,10 @@ module.exports = function (app) {
     app.get('/v1/me',
 	    isAuthenticated,
 	    me.index);
+
+    app.get('/v1/me/crate',
+	    isAuthenticated,
+	    crate.browse);
 
     app.get('/v1/me/inbox',
 	    isAuthenticated,
@@ -194,6 +199,15 @@ module.exports = function (app) {
     app.get('/v1/vitamin/:vitamin',
 	    vitamin.load,
 	    vitamin.read);
+
+    app.post('/v1/vitamin/:vitamin/crate',
+	    isAuthenticated,
+	    vitamin.load,
+	    crate.create);
+
+    app.del('/v1/vitamin/:vitamin/crate',
+	    isAuthenticated,
+	    crate.destroy);
 
     app.put('/v1/vitamin/:vitamin',
 	    isAuthenticated,

@@ -50,7 +50,12 @@ var read = function(req, res) {
     db.model('Page').forge({id: res.locals.page.id}).fetch({
 	withRelated: [
 	    'vitamins',
-	    'vitamins.hosts'
+	    'vitamins.hosts',
+	    {
+		'vitamins.crates': function(qb) {
+		    qb.where('user_id', req.user.id);
+		}
+	    }
 	]
     }).exec(function(err, page) {
 	if (err) log.error(err);

@@ -37,7 +37,12 @@ var read = function(req, res) {
 	    },
 	    'prescriptions.prescriber',
 	    'prescriptions.vitamins',
-	    'prescriptions.vitamins.hosts'
+	    'prescriptions.vitamins.hosts',
+	    {
+		'prescriptions.vitamins.crates': function(qb) {
+		    qb.where('user_id', req.user.id);
+		}
+	    }
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err);
@@ -96,7 +101,12 @@ var prescriptions = function(req, res) {
 	withRelated: [
 	    'prescriber',
 	    'vitamins',
-	    'vitamins.hosts'
+	    'vitamins.hosts',
+	    {
+		'vitamins.crates': function(qb) {
+		    qb.where('user_id', req.user.id);
+		}
+	    }
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err);
