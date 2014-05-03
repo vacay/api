@@ -86,30 +86,27 @@ module.exports = function (app) {
 	     auth.signin,
 	     me.index);
 
+    app.all('/v1/*',
+	    isAuthenticated);
+
     app.get('/v1/image',
-	    isAuthenticated,
 	    hasParams(['url']),
 	    image.proxy);
 
     app.get('/v1/me',
-	    isAuthenticated,
 	    me.index);
 
     app.get('/v1/me/crate',
-	    isAuthenticated,
 	    crate.browse);
 
     app.get('/v1/me/inbox',
-	    isAuthenticated,
 	    me.inbox);
 
     app.get('/v1/me/drafts',
-	    isAuthenticated,
 	    me.drafts);
 
     app.post('/v1/me/upload',
 	    hasParams(['ext']),
-	    isAuthenticated,
 	    me.upload);
 
     app.post('/v1/message',
@@ -131,7 +128,6 @@ module.exports = function (app) {
     //TODO: validate vitamins to make sure they exist
     //TODO: validate vitamin length
     app.post('/v1/prescription',
-	     isAuthenticated,
 	     prescription.create);
 
     app.get('/v1/prescription/:prescription',
@@ -139,17 +135,14 @@ module.exports = function (app) {
 	    prescription.read);
 
     app.post('/v1/prescription/:prescription/publish',
-	     isAuthenticated,
 	     prescription.publish);
 
     //TODO: validate vitamins to make sure they exist
     //TODO: validate vitamin length
     app.put('/v1/prescription/:prescription',
-	    isAuthenticated,
 	    prescription.update);
 
     app.del('/v1/prescription/:prescription',
-	    isAuthenticated,
 	    prescription.destroy);
 
     app.get('/v1/users',
@@ -160,18 +153,15 @@ module.exports = function (app) {
 	    user.read);
 
     app.put('/v1/user/:user',
-	    isAuthenticated,
 	    hasParams(['name', 'bio', 'location']),
 	    user.load,
 	    user.update); 
 
     app.post('/v1/user/:user/subscription',
-	     isAuthenticated,
 	     hasParams(['prescriber_id']),
 	     subscription.create);
 
     app.del('/v1/user/:user/subscription',
-	    isAuthenticated,
 	    hasParams(['prescriber_id']),
 	    subscription.destroy);
 
@@ -187,12 +177,10 @@ module.exports = function (app) {
 	    vitamin.browse);
 
     app.get('/v1/vitamins/sync',
-	    isAuthenticated,
 	    hasParams(['ids']),
 	    vitamin.sync);
 
     app.post('/v1/vitamin',
-	     isAuthenticated,
 	     hasParams(['url', 'title']),
 	     vitamin.create);
 
@@ -201,16 +189,13 @@ module.exports = function (app) {
 	    vitamin.read);
 
     app.post('/v1/vitamin/:vitamin/crate',
-	    isAuthenticated,
 	    vitamin.load,
 	    crate.create);
 
     app.del('/v1/vitamin/:vitamin/crate',
-	    isAuthenticated,
 	    crate.destroy);
 
     app.put('/v1/vitamin/:vitamin',
-	    isAuthenticated,
 	    hasParams(['title']),
 	    vitamin.load,
 	    vitamin.update);
