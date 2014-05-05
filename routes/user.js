@@ -57,14 +57,27 @@ var update = function(req, res) {
     db.model('User').edit({
 	id: res.locals.user.id,
 	name: req.param('name'),
+	email: req.param('email'),
+	notification: req.param('notification'),
 	bio: req.param('bio'),
 	location: req.param('location'),
 	avatar: req.param('avatar')
     }).exec(function(err, user) {
-	if (err) log.error(err);
+	var errorMessage, data;
+	if (err) {
+	    if (err.clientError && err.clientError.message.indexOf('ER_DUP_ENTRY') !== -1) {
+		errorMessage = 'Email address is already taken';
+	    } else {
+		log.error(err);
+		errorMessage = 'Failed to save update';
+	    }
+	} else {
+	    data = user.toJSON();
+	    data.email = user.attributes.email;
+	}
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err ? err : user.toJSON()
+	    data: err ? errorMessage : data
 	});
     });
 };

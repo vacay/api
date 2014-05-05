@@ -29,9 +29,11 @@ var index = function (req, res) {
 	    });
 
 	    var token = jwt.sign(req.user, config.session.secret, {expiresInMinutes: config.session.expires});
+	    var data = user.toJSON();
+	    data.email = user.attributes.email;
 	    res.send(200, {
 		session: req.user,
-		data: user.toJSON(),
+		data: data,
 		token: token
 	    });
 	}
