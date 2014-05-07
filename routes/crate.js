@@ -9,7 +9,7 @@ var browse = function(req, res) {
     db.model('User').forge({
 	id: req.user.id
     }).related('crate').query(function(qb) {
-	qb.limit(20).offset(offset);
+	qb.limit(50).offset(offset);
     }).fetch({
 	withRelated: [
 	    'hosts',
@@ -23,7 +23,7 @@ var browse = function(req, res) {
 	if (err) log.error(err);
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: vitamins.toJSON()
+	    data: err || !vitamins ? [] : vitamins.toJSON()
 	});
     });
 };
@@ -35,7 +35,7 @@ var create = function(req, res) {
 	if (err) log.error(err);
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: data.toJSON()
+	    data: err || !data ? [] : data.toJSON()
 	});
     });
 };
@@ -47,7 +47,7 @@ var destroy = function(req, res) {
 	if (err) log.error(err);
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: data.toJSON()
+	    data: err || !data ? [] : data.toJSON()
 	});
     });
 };
