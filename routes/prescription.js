@@ -216,7 +216,7 @@ var browse = function(req, res) {
 	if (err) log.error(err);
 	var data = err || !prescriptions ? err || [] : prescriptions.toJSON();
 
-	if (ids) {
+	if (ids.length) {
 	    utils.orderArray(ids, data);
 	}
 

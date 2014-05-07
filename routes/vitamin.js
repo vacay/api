@@ -222,7 +222,7 @@ var browse = function(req, res) {
 	if (err) log.error(err);
 	var data = err || !vitamins ? [] : vitamins.toJSON();
 
-	if (ids) {
+	if (ids.length) {
 	    utils.orderArray(ids, data);
 	}
 
