@@ -3,6 +3,7 @@
 var config = require('config-api'),
     log = require('log')(config.log),
     db = require('db')(config),
+    utils = require('../lib/utils'),
     async = require('async');
 
 var load = function(req, res, next) {
@@ -180,9 +181,15 @@ var browse = function(req, res) {
 
     ], function(err, users) {
 	if (err) log.error(err);
+	var data = err || !users ? err || [] : users.toJSON();
+
+	if (ids) {
+	    utils.orderArray(ids, data);
+	}
+
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err || !users ? err || [] : users.toJSON()
+	    data: data
 	});
     });
 };

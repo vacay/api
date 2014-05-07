@@ -3,6 +3,7 @@
 var config = require('config-api'),
     log = require('log')(config.log),
     db = require('db')(config),
+    utils = require('../lib/utils'),
     async = require('async');
 
 var load = function(req, res, next) {
@@ -48,17 +49,17 @@ var summary = function(req, res) {
 	    db.model('User').collection().query('whereIn', 'id', ids).fetch().exec(callback);
 	}
 
-    ], function(err, users) {
-	if (err) log.error(err);
+	    ], function(err, users) {
+		if (err) log.error(err);
 
-	var vitamin = res.locals.vitamin.toJSON();
-	vitamin.users = users.toJSON();
+		var vitamin = res.locals.vitamin.toJSON();
+		vitamin.users = users.toJSON();
 
-	res.send(err ? 500 : 200, {
-	    session: req.user,
-	    data: err ? err : vitamin
-	});
-    });
+		res.send(err ? 500 : 200, {
+		    session: req.user,
+		    data: err ? err : vitamin
+		});
+	    });
 };
 
 var create = function(req, res) {
@@ -219,9 +220,15 @@ var browse = function(req, res) {
 
     ], function(err, vitamins) {
 	if (err) log.error(err);
+	var data = err || !vitamins ? [] : vitamins.toJSON();
+
+	if (ids) {
+	    utils.orderArray(ids, data);
+	}
+
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err || !vitamins ? err || [] : vitamins.toJSON()
+	    data: data
 	});
     });
 };
