@@ -14,7 +14,8 @@ module.exports = {
 	service: 'Gmail',
 	auth: {
 	    user: 'admin@vacay.io',
-	    pass: 'Danger1$'
+	    pass: 'Danger1$',
+	    socketTimeout: 60 * 1000 //one minute
 	}
     },
 
