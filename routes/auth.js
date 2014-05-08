@@ -119,7 +119,7 @@ module.exports.requestReset = function(req, res) {
 	    }, config.reset.secret, {
 		expiresInMinutes: config.reset.expires
 	    });
-	    var resetLink = config.url + '?reset=' + token;
+	    var resetLink = config.url + '/inbox?reset=' + token;
 	    var mailOptions = {
 		from: 'Vacay <admin@vacay.io>',
 		to: user.attributes.name + ' <' + user.attributes.email + '>',
