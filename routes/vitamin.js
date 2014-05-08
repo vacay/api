@@ -9,6 +9,14 @@ var config = require('config-api'),
 var load = function(req, res, next) {
     db.model('Vitamin').findOne({
 	id: req.param('vitamin')
+    }, {
+	withRelated: [
+	    {
+		'crates': function(qb) {
+		    qb.where('user_id', req.user.id);
+		}
+	    }
+	]
     }).exec(function(err, vitamin) {
 	if (err) {
 	    log.error(err);
