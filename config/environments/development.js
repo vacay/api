@@ -47,7 +47,7 @@ module.exports = {
 	host: 'localhost',
 	port: 3306,
 	user: 'root',
-	charset  : 'utf8'
+	charset  : 'UTF8_GENERAL_CI'
     },
     
     redis: {

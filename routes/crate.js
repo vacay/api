@@ -6,9 +6,20 @@ var config = require('config-api'),
 
 var browse = function(req, res) {
     var offset = req.param('offset') || 0;
+    var query = req.param('q') || null;
     db.model('User').forge({
 	id: req.user.id
     }).related('crate').query(function(qb) {
+	if (query) {
+	    var terms = query.split(" ");
+	    for (var i=0; i<terms.length; i++) {
+		if (i === 0) {
+		    qb.where('title', 'LIKE', '%' + terms[i] + '%');
+		} else {
+		    qb.orWhere('title', 'LIKE', '%' + terms[i] + '%');
+		}
+	    }
+	}
 	qb.limit(50).offset(offset);
     }).fetch({
 	withRelated: [
