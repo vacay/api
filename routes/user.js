@@ -47,6 +47,7 @@ var read = function(req, res) {
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err, res.locals.logRequest(req));
+	if (!user) log.error('no user', res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : user.toJSON()
