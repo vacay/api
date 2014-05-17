@@ -11,7 +11,7 @@ var load = function(req, res, next) {
 	id: req.param('prescription')
     }).exec(function(err, prescription) {
 	if (err || !prescription) {
-	    if (err) log.error(err);
+	    if (err) log.error(err, res.locals.logRequest(req));
 	    res.send(err ? 500 : 404, {
 		session: req.user,
 		data: err ? err : 'invalid page id: ' + req.param('prescription')
@@ -36,7 +36,7 @@ var read = function(req, res) {
 	    }
 	]
     }).exec(function(err, prescription) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : prescription.toJSON()
@@ -73,7 +73,7 @@ var create = function(req, res) {
 	}
 
     ], function(err, prescription) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : prescription.toJSON()
@@ -86,7 +86,7 @@ var publish = function(req, res) {
 	id: req.param('prescription'),
 	published_at: new Date()
     }).exec(function(err, prescription) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : prescription.toJSON()
@@ -131,7 +131,7 @@ var update = function(req, res) {
 	}
 
     ], function(err, prescription) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : prescription.toJSON()
@@ -144,7 +144,7 @@ var destroy = function(req, res) {
     db.model('Prescription')
 	.destroy(req.param('prescription'))
 	.exec(function(err, prescription) {
-	    if (err) log.error(err);
+	    if (err) log.error(err, res.locals.logRequest(req));
 	    res.send(err ? 500 : 200, {
 		session: req.user,
 		data: err ? err : prescription.toJSON()
@@ -213,7 +213,7 @@ var browse = function(req, res) {
 	}
 
     ], function(err, prescriptions) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	var data = err || !prescriptions ? err || [] : prescriptions.toJSON();
 
 	if (ids.length) {

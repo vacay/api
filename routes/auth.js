@@ -47,7 +47,7 @@ module.exports.signup = function (req, res, next) {
 		data: err
 	    });
 	} else if (err) {
-	    log.error(err);
+	    log.error(err, res.locals.logRequest(req));
 	    res.send(500, {
 		session: null,
 		data: 'Could not add user'
@@ -78,7 +78,7 @@ module.exports.reset = function(req, res, next) {
 	    email: email
 	}).then(function (user) {
 	    if (err) {
-		log.error(err);
+		log.error(err, res.locals.logRequest(req));
 		res.send(400, {
 		    session: null,
 		    data: 'Please request a new reset password link'
@@ -86,7 +86,7 @@ module.exports.reset = function(req, res, next) {
 	    } else {
 		user.resetPassword(req.param('password'), function(err) {
 		    if (err) {
-			log.error(err);
+			log.error(err, res.locals.logRequest(req));
 			res.send(500, {
 			    session: null,
 			    data: 'Unable to reset password'
@@ -127,7 +127,7 @@ module.exports.requestReset = function(req, res) {
 		html: 'Reset password: <a href="' + resetLink + '">' + resetLink + '</a>' 
 	    };
 	    res.locals.smtp.sendMail(mailOptions, function(err, data) {
-		if (err) log.error(err);
+		if (err) log.error(err, res.locals.logRequest(req));
 		res.send(err ? 500 : 200, {
 		    session: null,
 		    data: err ? 'Failed to send link, try again later' : 'sent'

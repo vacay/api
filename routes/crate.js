@@ -31,7 +31,7 @@ var browse = function(req, res) {
 	    }
 	]
     }).exec(function(err, vitamins) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err || !vitamins ? [] : vitamins.toJSON()
@@ -43,7 +43,7 @@ var create = function(req, res) {
     db.model('User').forge({
 	id: req.user.id
     }).crate().attach(res.locals.vitamin.id).exec(function(err, data) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err || !data ? [] : data.toJSON()
@@ -55,7 +55,7 @@ var destroy = function(req, res) {
     db.model('User').forge({
 	id: req.user.id
     }).crate().detach(req.param('vitamin')).exec(function(err, data) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err || !data ? [] : data.toJSON()

@@ -15,7 +15,7 @@ var index = function (req, res) {
 	]
     }).exec(function (err, user) {
 	if (err) {
-	    log.error(err);
+	    log.error(err, res.locals.logRequest(req));
 	    res.send(500, {
 		session: req.user,
 		data: err
@@ -25,7 +25,7 @@ var index = function (req, res) {
 		id: req.user.id,
 		last_visit: new Date()
 	    }).exec(function(err) {
-		if (err) log.error(err);
+		if (err) log.error(err, res.locals.logRequest(req));
 	    });
 
 	    var token = jwt.sign(req.user, config.session.secret, {expiresInMinutes: config.session.expires});
@@ -46,7 +46,7 @@ var inbox = function(req, res) {
     var offset = req.param('offset') || 0;
     
     db.model('User').forge({id: req.user.id}).inbox(sort, offset, function(err, prescriptions) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : prescriptions.toJSON()
@@ -111,7 +111,7 @@ var drafts = function(req, res) {
 		}
 	    ]
 	}).exec(function(err, prescriptions) {
-	    if (err) log.error(err);
+	    if (err) log.error(err, res.locals.logRequest(req));
 	    res.send(err ? 500 : 200, {
 		session: req.user,
 		data: err ? err : prescriptions.toJSON()

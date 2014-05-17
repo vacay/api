@@ -16,6 +16,17 @@ var es = new elasticsearch.Client(config.elasticsearch);
 
 var smtp = nodemailer.createTransport('SMTP', config.smtp);
 
+var logRequest = function(req) {
+    return {
+	url: req.url,
+	headers: req.headers,
+	method: req.method,
+	originalUrl: req.originalUrl,
+	query: req.query,
+	httpVersion: req.httpVersion
+    };
+};
+
 app.configure(function () {
 
     app.use(express.logger({
@@ -31,6 +42,7 @@ app.configure(function () {
     app.use(function (req, res, next) {
 	res.locals.es = es;
 	res.locals.smtp = smtp;
+	res.locals.logRequest = logRequest;
 	res.locals.env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development';
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -56,17 +68,6 @@ app.configure(function () {
 
     app.use(app.router);
 
-});
-
-app.configure('development', function () {
-    app.use(express.errorHandler({
-	dumpExceptions: true,
-	showStack: true
-    }));
-});
-
-app.configure('production', function () {
-    app.use(express.errorHandler());
 });
 
 routes(app);

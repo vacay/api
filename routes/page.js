@@ -11,7 +11,7 @@ var load = function(req, res, next) {
 	id: req.param('page')
     }).exec(function(err, page) {
 	if (err) {
-	    log.error(err);
+	    log.error(err, res.locals.logRequest(req));
 	    res.send(500, {
 		session: req.user,
 		data: err
@@ -34,7 +34,7 @@ var create = function(req, res, next) {
     var url = uri.subdomain() === '' ? uri.subdomain('www').toString() : uri.toString();
     db.model('Page').findOrCreate(url, function(err, page) {
 	if (err) {
-	    log.error(err);
+	    log.error(err, res.locals.logRequest(req));
 	    res.send(500, {
 		session: req.user,
 		data: err
@@ -58,7 +58,7 @@ var read = function(req, res) {
 	    }
 	]
     }).exec(function(err, page) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : page.toJSON()

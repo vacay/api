@@ -11,7 +11,7 @@ var create = function(req, res) {
 	created_at: new Date(),
 	updated_at: new Date()
     }).exec(function(err, subscription) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : subscription
@@ -24,7 +24,7 @@ var destroy = function(req, res) {
 	prescriber_id: req.param('prescriber_id'),
 	subscriber_id: req.user.id
     }).del().exec(function(err, numRows) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : numRows

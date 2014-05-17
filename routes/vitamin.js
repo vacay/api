@@ -19,7 +19,7 @@ var load = function(req, res, next) {
 	]
     }).exec(function(err, vitamin) {
 	if (err) {
-	    log.error(err);
+	    log.error(err, res.locals.logRequest(req));
 	    res.send(500, {
 		session: req.user,
 		data: err
@@ -58,7 +58,7 @@ var summary = function(req, res) {
 	}
 
 	    ], function(err, users) {
-		if (err) log.error(err);
+		if (err) log.error(err, res.locals.logRequest(req));
 
 		var vitamin = res.locals.vitamin.toJSON();
 		vitamin.users = users.toJSON();
@@ -75,7 +75,7 @@ var create = function(req, res) {
 	url: req.param('url'),
 	title: req.param('title')
     }, function(err, vitamin) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : vitamin.toJSON()
@@ -103,7 +103,7 @@ var read = function(req, res) {
 	    }
 	]
     }).exec(function(err, vitamin) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : vitamin.toJSON()
@@ -116,7 +116,7 @@ var update = function(req, res) {
 	id: res.locals.vitamin.id,
 	title: req.param('title')
     }).exec(function(err, vitamin) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : vitamin.toJSON()
@@ -146,7 +146,7 @@ var prescriptions = function(req, res) {
 	    }
 	]
     }).exec(function(err, vitamin) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : vitamin.toJSON()
@@ -161,7 +161,7 @@ var pages = function(req, res) {
 	    'pages'
 	]
     }).exec(function(err, vitamin) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.end(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : vitamin.toJSON()
@@ -227,7 +227,7 @@ var browse = function(req, res) {
 	}
 
     ], function(err, vitamins) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	var data = err || !vitamins ? [] : vitamins.toJSON();
 
 	if (ids.length) {
@@ -249,7 +249,7 @@ var sync = function(req, res) {
 	qb.whereIn('id', ids);
 	if (last_synced_at) qb.andWhere('updated_at', '>', last_synced_at);
     }).fetch({ withRelated: ['hosts'] }).exec(function(err, vitamins) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err || !vitamins ? err || [] : vitamins.toJSON()

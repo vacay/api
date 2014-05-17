@@ -11,7 +11,7 @@ var load = function(req, res, next) {
 	username: req.param('user')
     }).exec(function(err, user) {
 	if (err) {
-	    log.error(err);
+	    log.error(err, res.locals.logRequest(req));
 	    res.send(500, {
 		session: req.user,
 		data: err
@@ -46,7 +46,7 @@ var read = function(req, res) {
 	    }
 	]
     }).exec(function(err, user) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : user.toJSON()
@@ -69,7 +69,7 @@ var update = function(req, res) {
 	    if (err.clientError && err.clientError.message.indexOf('ER_DUP_ENTRY') !== -1) {
 		errorMessage = 'Email address is already taken';
 	    } else {
-		log.error(err);
+		log.error(err, res.locals.logRequest(req));
 		errorMessage = 'Failed to save update';
 	    }
 	} else {
@@ -95,7 +95,7 @@ var subscribers = function(req, res) {
 	    }
 	]
     }).exec(function(err, user) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : user.toJSON()
@@ -123,7 +123,7 @@ var prescriptions = function(req, res) {
 	    }
 	]
     }).exec(function(err, user) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : user.toJSON()
@@ -180,7 +180,7 @@ var browse = function(req, res) {
 	}
 
     ], function(err, users) {
-	if (err) log.error(err);
+	if (err) log.error(err, res.locals.logRequest(req));
 	var data = err || !users ? err || [] : users.toJSON();
 
 	if (ids.length) {
