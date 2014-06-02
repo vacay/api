@@ -7,6 +7,7 @@ var auth = require('./auth'),
     page = require('./page'),
     user = require('./user'),
     prescription = require('./prescription'),
+    discussion = require('./discussion'),
     subscription = require('./subscription'),
     vitamin = require('./vitamin'),
     crate = require('./crate'),
@@ -88,6 +89,46 @@ module.exports = function (app) {
 
     app.all('/v1/*',
 	    isAuthenticated);
+
+    app.get('/v1/discussions',
+	    discussion.browse);
+
+    app.post('/v1/discussion',
+	     hasParams(['title', 'description']),
+	     discussion.create);
+
+    app.get('/v1/discussion/:discussion',
+	    discussion.load,
+	    discussion.read);
+
+    app.put('/v1/discussion/:discussion',
+	    hasParams(['title', 'description']),
+	    discussion.load,
+	    discussion.update);
+
+    app.post('/v1/discussion/:discussion/vote',
+	     hasParams(['vote']),
+	     discussion.load,
+	     discussion.createDiscussionVote);
+
+    app.del('/v1/discussion/:discussion/vote',
+	    discussion.load,
+	    discussion.destroyDiscussionVote);
+
+    app.post('/v1/discussion/:discussion/comment',
+	     hasParams(['body']),
+	     discussion.load,
+	     discussion.createComment);
+
+    app.put('/v1/discussion/:discussion/comment/:comment',
+	    hasParams(['body']),
+	    discussion.loadComment,
+	    discussion.updateComment);
+
+    app.post('/v1/discussion/:discussion/comment/:comment/vote',
+	     hasParams(['vote']),
+	     discussion.loadComment,
+	     discussion.createCommentVote);
 
     app.get('/v1/image',
 	    hasParams(['url']),

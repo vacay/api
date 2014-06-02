@@ -35,6 +35,8 @@ module.exports.signin = function (req, res, next) {
 };
 
 module.exports.signup = function (req, res, next) {
+    //TODO: check username against blacklist
+    //TODO: lowercase username
     db.model('User').create({
 	email: req.param('email'),
 	name: req.param('name'),

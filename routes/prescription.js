@@ -45,6 +45,7 @@ var read = function(req, res) {
 };
 
 var create = function(req, res) {
+    //TODO: validate description length
     async.waterfall([
 
 	function(callback) {	    
@@ -95,6 +96,7 @@ var publish = function(req, res) {
 };
 
 var update = function(req, res) {
+    //TODO: validate description length
     async.waterfall([
 
 	function(callback) {
@@ -141,6 +143,7 @@ var update = function(req, res) {
 
 var destroy = function(req, res) {
     //TODO: delete vitamin relations too
+    //TODO: delete from elasticsearch too
     db.model('Prescription')
 	.destroy(req.param('prescription'))
 	.exec(function(err, prescription) {
