@@ -109,7 +109,7 @@ var prescriptions = function(req, res) {
     res.locals.user.prescriptions().query(function(qb) {
 	qb.whereNotNull('published_at')
 	    .whereNull('prescriptions.recipient_id')
-	    .orderBy('prescriptions.created_at', 'desc')
+	    .orderBy('prescriptions.published_at', 'desc')
 	    .limit(20)
 	    .offset(offset);
     }).fetch({
