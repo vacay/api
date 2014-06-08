@@ -20,7 +20,7 @@ var browse = function(req, res) {
 		}
 	    }
 	}
-	qb.limit(50).offset(offset);
+	qb.limit(50).offset(offset).orderBy('created_at', 'desc');
     }).fetch({
 	withRelated: [
 	    'hosts',
@@ -42,7 +42,10 @@ var browse = function(req, res) {
 var create = function(req, res) {
     db.model('User').forge({
 	id: req.user.id
-    }).crate().attach(res.locals.vitamin.id).exec(function(err, data) {
+    }).crate().attach({
+	vitamin_id: res.locals.vitamin.id,
+	created_at: new Date()
+    }).exec(function(err, data) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,

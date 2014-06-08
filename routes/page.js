@@ -49,7 +49,11 @@ var create = function(req, res, next) {
 var read = function(req, res) {
     db.model('Page').forge({id: res.locals.page.id}).fetch({
 	withRelated: [
-	    'vitamins',
+	    {
+		'vitamins': function(qb) {
+		    qb.where('on_page', true);
+		}
+	    },
 	    'vitamins.hosts',
 	    {
 		'vitamins.crates': function(qb) {
