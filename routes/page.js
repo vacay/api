@@ -70,8 +70,28 @@ var read = function(req, res) {
     });
 };
 
+var track = function(req, res) {
+    res.locals.page.related('users').attach(req.user.id).exec(function(err, relation) {
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err ? err : relation.toJSON()
+	});
+    });
+};
+
+var untrack = function(req, res) {
+    res.locals.page.related('users').detach(req.user.id).exec(function(err, relation) {
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err ? err : relation.toJSON()
+	});
+    });
+};
+
 module.exports = {
     load: load,
     create: create,
-    read: read
+    read: read,
+    track: track,
+    untrack: untrack
 };

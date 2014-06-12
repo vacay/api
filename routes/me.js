@@ -119,9 +119,49 @@ var drafts = function(req, res) {
 	});
 };
 
+var pages = function(req, res) {
+    db.model('User').forge({id: req.user.id}).related('pages').fetch().exec(function(err, pages) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err ? err : pages.toJSON()
+	});
+    });
+};
+
+var tracker = function(req, res) {
+    var offset = req.param('offset') || 0;
+    db.model('Vitamin').collection().query(function(qb) {
+	qb.join('pages_vitamins', 'vitamins.id', '=', 'pages_vitamins.vitamin_id')
+	    .join('pages_users', 'pages_vitamins.page_id', '=', 'pages_users.page_id')
+	    .where('pages_users.user_id', req.user.id)
+	    .offset(offset)
+	    .limit(20)
+	    .orderBy('pages_vitamins.created_at', 'desc');
+    }).fetch({
+	withRelated: [
+	    'hosts',
+	    'pages',
+	    {
+		crates: function(qb) {
+		    qb.where('user_id', req.user.id);
+		}
+	    }
+	]
+    }).exec(function(err, vitamins) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err ? err : vitamins.toJSON()
+	});
+    });
+};
+
 module.exports = {
     index: index,
     inbox: inbox,
     upload: upload,
-    drafts: drafts
+    drafts: drafts,
+    pages: pages,
+    tracker: tracker
 };

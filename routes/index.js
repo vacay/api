@@ -146,6 +146,12 @@ module.exports = function (app) {
     app.get('/v1/me/drafts',
 	    me.drafts);
 
+    app.get('/v1/me/pages',
+	    me.pages);
+
+    app.get('/v1/me/tracker',
+	    me.tracker);
+
     app.post('/v1/me/upload',
 	    hasParams(['ext']),
 	    me.upload);
@@ -162,6 +168,14 @@ module.exports = function (app) {
     app.get('/v1/page/:page',
 	    page.load,
 	    page.read);
+
+    app.post('/v1/page/:page/track',
+	    page.load,
+	    page.track);
+
+    app.del('/v1/page/:page/track',
+	    page.load,
+	    page.untrack);
 
     app.get('/v1/prescriptions',
 	    prescription.browse);
