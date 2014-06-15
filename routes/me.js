@@ -136,7 +136,8 @@ var tracker = function(req, res) {
 	    .join('pages_users', 'pages_vitamins.page_id', '=', 'pages_users.page_id')
 	    .where('pages_users.user_id', req.user.id)
 	    .offset(offset)
-	    .limit(20)
+	    .limit(50)
+	    .groupBy('id')
 	    .orderBy('pages_vitamins.created_at', 'desc');
     }).fetch({
 	withRelated: [
