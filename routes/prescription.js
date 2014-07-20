@@ -31,14 +31,14 @@ var read = function(req, res) {
 	    'vitamins.hosts',
 	    {
 		'vitamins.crates': function(qb) {
-		    qb.where('user_id', req.user.id);
+		    qb.where('user_id', req.user ? req.user.id : 0);
 		}
 	    }
 	]
     }).exec(function(err, prescription) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
-	    session: req.user,
+	    session: req.user || null,
 	    data: err ? err : prescription.toJSON()
 	});
     });

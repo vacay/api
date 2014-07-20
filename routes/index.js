@@ -87,102 +87,123 @@ module.exports = function (app) {
 	     auth.signin,
 	     me.index);
 
-    app.all('/v1/*',
-	    isAuthenticated);
-
     app.get('/v1/discussions',
+	    isAuthenticated,
 	    discussion.browse);
 
     app.post('/v1/discussion',
+	     isAuthenticated,
 	     hasParams(['title', 'description']),
 	     discussion.create);
 
     app.get('/v1/discussion/:discussion',
+	    isAuthenticated,
 	    discussion.load,
 	    discussion.read);
 
     app.put('/v1/discussion/:discussion',
+	    isAuthenticated,
 	    hasParams(['title', 'description']),
 	    discussion.load,
 	    discussion.update);
 
     app.post('/v1/discussion/:discussion/vote',
+	     isAuthenticated,
 	     hasParams(['vote']),
 	     discussion.load,
 	     discussion.createDiscussionVote);
 
     app.del('/v1/discussion/:discussion/vote',
+	    isAuthenticated,
 	    discussion.load,
 	    discussion.destroyDiscussionVote);
 
     app.post('/v1/discussion/:discussion/comment',
+	     isAuthenticated,
 	     hasParams(['body']),
 	     discussion.load,
 	     discussion.createComment);
 
     app.put('/v1/discussion/:discussion/comment/:comment',
+	    isAuthenticated,
 	    hasParams(['body']),
 	    discussion.loadComment,
 	    discussion.updateComment);
 
     app.post('/v1/discussion/:discussion/comment/:comment/vote',
+	     isAuthenticated,
 	     hasParams(['vote']),
 	     discussion.loadComment,
 	     discussion.createCommentVote);
 
     app.get('/v1/image',
+	    isAuthenticated,
 	    hasParams(['url']),
 	    image.proxy);
 
     app.get('/v1/me',
+	    isAuthenticated,
 	    me.index);
 
     app.get('/v1/me/crate',
+	    isAuthenticated,
 	    crate.browse);
 
     app.get('/v1/me/inbox',
+	    isAuthenticated,
 	    me.inbox);
 
     app.get('/v1/me/drafts',
+	    isAuthenticated,
 	    me.drafts);
 
     app.get('/v1/me/pages',
+	    isAuthenticated,
 	    me.pages);
 
     app.get('/v1/me/tracker',
+	    isAuthenticated,
 	    me.tracker);
 
     app.post('/v1/me/upload',
-	    hasParams(['ext']),
-	    me.upload);
+	     isAuthenticated,
+	     hasParams(['ext']),
+	     me.upload);
 
     app.post('/v1/message',
+	     isAuthenticated,
 	     hasParams(['name', 'email', 'subject', 'body']),
 	     message.create);
 
     app.post('/v1/page',
+	     isAuthenticated,
 	     hasParams(['url']),
 	     page.create,
 	     page.read);
 
     app.get('/v1/page/:page',
+	    isAuthenticated,
 	    page.load,
 	    page.read);
 
     app.post('/v1/page/:page/track',
-	    page.load,
-	    page.track);
+	     isAuthenticated,
+	     page.load,
+	     page.track);
 
     app.del('/v1/page/:page/track',
+	    isAuthenticated,
 	    page.load,
 	    page.untrack);
 
     app.get('/v1/prescriptions',
+	    isAuthenticated,
 	    prescription.browse);
 
     //TODO: validate vitamins to make sure they exist
     //TODO: validate vitamin length
     app.post('/v1/prescription',
+	     isAuthenticated,
 	     prescription.create);
 
     app.get('/v1/prescription/:prescription',
@@ -190,80 +211,100 @@ module.exports = function (app) {
 	    prescription.read);
 
     app.post('/v1/prescription/:prescription/publish',
+	     isAuthenticated,
 	     prescription.publish);
 
     //TODO: validate vitamins to make sure they exist
     //TODO: validate vitamin length
     app.put('/v1/prescription/:prescription',
+	    isAuthenticated,
 	    prescription.update);
 
     app.del('/v1/prescription/:prescription',
+	    isAuthenticated,
 	    prescription.destroy);
 
     app.get('/v1/users',
+	    isAuthenticated,
 	    user.browse);
 
     app.get('/v1/user/:user',
+	    isAuthenticated,
 	    user.load,
 	    user.read);
 
     app.put('/v1/user/:user',
+	    isAuthenticated,
 	    hasParams(['name', 'bio', 'location']),
 	    user.load,
 	    user.update); 
 
     app.post('/v1/user/:user/subscription',
+	     isAuthenticated,
 	     hasParams(['prescriber_id']),
 	     subscription.create);
 
     app.del('/v1/user/:user/subscription',
+	    isAuthenticated,
 	    hasParams(['prescriber_id']),
 	    subscription.destroy);
 
     app.get('/v1/user/:user/subscribers',
+	    isAuthenticated,
 	    user.load,
 	    user.subscribers);
 
     app.get('/v1/user/:user/prescriptions',
+	    isAuthenticated,
 	    user.load,
 	    user.prescriptions);
 
     app.get('/v1/vitamins',
+	    isAuthenticated,
 	    vitamin.browse);
 
     app.get('/v1/vitamins/sync',
+	    isAuthenticated,
 	    hasParams(['ids']),
 	    vitamin.sync);
 
     app.post('/v1/vitamin',
+	     isAuthenticated,
 	     hasParams(['url', 'title']),
 	     vitamin.create);
 
     app.get('/v1/vitamin/:vitamin',
+	    isAuthenticated,
 	    vitamin.load,
 	    vitamin.read);
 
     app.post('/v1/vitamin/:vitamin/crate',
-	    vitamin.load,
-	    crate.create);
+	     isAuthenticated,
+	     vitamin.load,
+	     crate.create);
 
     app.del('/v1/vitamin/:vitamin/crate',
+	    isAuthenticated,
 	    crate.destroy);
 
     app.put('/v1/vitamin/:vitamin',
+	    isAuthenticated,
 	    hasParams(['title']),
 	    vitamin.load,
 	    vitamin.update);
 
     app.get('/v1/vitamin/:vitamin/summary',
+	    isAuthenticated,
 	    vitamin.load,
 	    vitamin.summary);
 
     app.get('/v1/vitamin/:vitamin/prescriptions',
+	    isAuthenticated,
 	    vitamin.load,
 	    vitamin.prescriptions);
 
     app.get('/v1/vitamin/:vitamin/pages',
+	    isAuthenticated,
 	    vitamin.load,
 	    vitamin.pages);
 
