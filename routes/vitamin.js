@@ -71,9 +71,13 @@ var summary = function(req, res) {
 };
 
 var create = function(req, res) {
-    db.model('Vitamin').upload({
+    db.model('Vitamin').findOrCreate({
 	url: req.param('url'),
-	title: req.param('title')
+	duration: req.param('duration'),
+	title: req.param('title'),
+	host: req.param('host'),
+	id: req.param('id'),
+	stream_url: req.param('stream_url')
     }, function(err, vitamin) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
