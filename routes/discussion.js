@@ -38,7 +38,7 @@ var nestComments = function(comments) {
 };
 
 var browse = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     db.model('Discussion')
 	.collection()
 	.query(function(qb) {

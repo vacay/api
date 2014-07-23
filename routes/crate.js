@@ -5,7 +5,7 @@ var config = require('config-api'),
     db = require('db')(config);
 
 var browse = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     var query = req.param('q') || null;
     db.model('User').forge({
 	id: req.user.id

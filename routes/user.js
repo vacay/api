@@ -85,7 +85,7 @@ var update = function(req, res) {
 };
 
 var subscribers = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     res.locals.user.fetch({
 	withRelated: [
 	    {
@@ -105,7 +105,7 @@ var subscribers = function(req, res) {
 };
 
 var prescriptions = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     res.locals.user.prescriptions().query(function(qb) {
 	qb.whereNotNull('published_at')
 	    .whereNull('prescriptions.recipient_id')
@@ -133,7 +133,7 @@ var prescriptions = function(req, res) {
 };
 
 var browse = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     var query = req.param('q') || null;
     var ids = req.param('ids') || [];
 

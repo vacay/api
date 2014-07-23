@@ -43,7 +43,7 @@ var index = function (req, res) {
 var inbox = function(req, res) {
 
     var sort = req.param('sort') || 'desc';
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     
     db.model('User').forge({id: req.user.id}).inbox(sort, offset, function(err, prescriptions) {
 	if (err) log.error(err, res.locals.logRequest(req));
@@ -93,7 +93,7 @@ var upload = function(req, res) {
 };
 
 var drafts = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     db.model('Prescription')
 	.collection()
 	.query(function(qb) {
@@ -130,10 +130,10 @@ var pages = function(req, res) {
 };
 
 var tracker = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     db.model('Vitamin').collection().query(function(qb) {
-	qb.join('pages_vitamins', 'vitamins.id', '=', 'pages_vitamins.vitamin_id')
-	    .join('pages_users', 'pages_vitamins.page_id', '=', 'pages_users.page_id')
+	qb.innerJoin('pages_vitamins', 'vitamins.id', 'pages_vitamins.vitamin_id')
+	    .innerJoin('pages_users', 'pages_vitamins.page_id', 'pages_users.page_id')
 	    .where('pages_users.user_id', req.user.id)
 	    .offset(offset)
 	    .limit(50)

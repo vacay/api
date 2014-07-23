@@ -41,8 +41,8 @@ var summary = function(req, res) {
 	function(callback) {
 	    db.knex('prescriptions')
 		.select(db.knex.raw('count(subscriptions.prescriber_id) as score, prescriptions.prescriber_id'))
-		.join('prescriptions_vitamins', 'prescriptions_vitamins.prescription_id', '=', 'prescriptions.id', 'inner')
-		.join('subscriptions', 'subscriptions.prescriber_id', '=', 'prescriptions.prescriber_id', 'left')
+		.innerJoin('prescriptions_vitamins', 'prescriptions.id', 'prescriptions_vitamins.prescription_id')
+		.leftJoin('subscriptions', 'prescriptions.precriber_id', 'subscriptions.prescriber_id')
 		.where('prescriptions_vitamins.vitamin_id', res.locals.vitamin.id)
 		.orderBy('score', 'desc')
 		.limit(8)
@@ -129,7 +129,7 @@ var update = function(req, res) {
 };
 
 var prescriptions = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     res.locals.vitamin.fetch({
 	withRelated: [
 	    {
@@ -159,7 +159,7 @@ var prescriptions = function(req, res) {
 };
 
 var pages = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     res.locals.vitamin.fetch({
 	withRelated: [
 	    'pages'
@@ -174,7 +174,7 @@ var pages = function(req, res) {
 };
 
 var browse = function(req, res) {
-    var offset = req.param('offset') || 0;
+    var offset = parseInt(req.param('offset'), 10) || 0;
     var query = req.param('q') || null;
     var ids = req.param('ids') || [];
 
