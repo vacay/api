@@ -42,7 +42,7 @@ var summary = function(req, res) {
 	    db.knex('prescriptions')
 		.select(db.knex.raw('count(subscriptions.prescriber_id) as score, prescriptions.prescriber_id'))
 		.innerJoin('prescriptions_vitamins', 'prescriptions.id', 'prescriptions_vitamins.prescription_id')
-		.leftJoin('subscriptions', 'prescriptions.precriber_id', 'subscriptions.prescriber_id')
+		.leftJoin('subscriptions', 'prescriptions.prescriber_id', 'subscriptions.prescriber_id')
 		.where('prescriptions_vitamins.vitamin_id', res.locals.vitamin.id)
 		.orderBy('score', 'desc')
 		.limit(8)
