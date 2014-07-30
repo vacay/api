@@ -8,16 +8,6 @@ module.exports = {
     ssl: true,
     tmp: '/home/deploy/vacay/shared/tmp',
     debug: false,
-    mailgun: 'key-3565e5ul9xwr-ir8c4n3f4ud7ur59dp8',
-
-    smtp: {
-	service: 'Gmail',
-	auth: {
-	    user: 'admin@vacay.io',
-	    pass: 'Danger1$',
-	    socketTimeout: 60 * 1000 //one minute
-	}
-    },
 
     reset: {
 	secret: 'AWRO7Na+EgvvBA==',

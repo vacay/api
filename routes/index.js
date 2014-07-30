@@ -171,7 +171,6 @@ module.exports = function (app) {
 	     me.upload);
 
     app.post('/v1/message',
-	     isAuthenticated,
 	     hasParams(['name', 'email', 'subject', 'body']),
 	     message.create);
 

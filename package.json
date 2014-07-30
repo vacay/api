@@ -23,10 +23,9 @@
 	"uuid": "1.4.1",
 	"moment": "2.5.1",
 	"log": "https://api.github.com/repos/vacay/log/tarball/0.0.1",
-	"mailgun": "0.4.2",
-	"nodemailer": "0.6.3",
 	"request": "2.34.0",
-	"elasticsearch": "2.1.1"
+	"elasticsearch": "2.1.1",
+	"queue": "vacay/queue"
     },
     "engines": {
 	"node": "0.10.x",

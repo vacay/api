@@ -1,21 +1,23 @@
 /* global module, require */
 
-var config = require('config-api'),
-    Mailgun = require('mailgun').Mailgun,
-    mg = new Mailgun(config.mailgun);
-
 var create = function(req, res) {
-    mg.sendText(
-	req.param('name') + ' <' + req.param('email') + '>',
-	['kia <kr@vacay.io>'],
-	'vacay.io: ' + req.param('subject'),
-	req.param('body'),
-	function(err) {
-	    res.send(err ? 500 : 200, {
-		session: req.user,
-		data: err ? err : 'Sent'
-	    });
-	});
+    var emails = ['kr@vacay.io'];
+    var subject = '[contact] ' + req.param('subject');
+    var html = '<p>' + req.param('body') + '</p>';
+    html += '- ' + req.param('name');
+
+    res.locals.queue.create('email', {
+	title: 'contact:' + req.param('email'),
+	emails: emails,
+	replyTo: req.param('email'),
+	subject: subject,
+	html: html
+    }).save();
+
+    res.send(200, {
+	session: req.user,
+	data: 'sent'
+    });
 };
 
 module.exports = {

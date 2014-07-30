@@ -35,8 +35,6 @@ module.exports.signin = function (req, res, next) {
 };
 
 module.exports.signup = function (req, res, next) {
-    //TODO: check username against blacklist
-    //TODO: lowercase username
     db.model('User').create({
 	email: req.param('email'),
 	name: req.param('name'),
@@ -116,24 +114,30 @@ module.exports.requestReset = function(req, res) {
 		data: 'Invalid email'
 	    });
 	} else {
+
 	    var token = jwt.sign({
 		email: user.attributes.email
 	    }, config.reset.secret, {
 		expiresInMinutes: config.reset.expires
 	    });
-	    var resetLink = config.url + '/inbox?reset=' + token;
-	    var mailOptions = {
-		from: 'Vacay <admin@vacay.io>',
-		to: user.attributes.name + ' <' + user.attributes.email + '>',
-		subject: 'vacay.io: password reset link',
-		html: 'Reset password: <a href="' + resetLink + '">' + resetLink + '</a>' 
+	    var emails = ['admin@vacay.io', user.attributes.email];
+	    var html = '<p>Forget your password did you? Use the link below to set a new one</p>';
+	    var link = {
+		target: '/inbox?reset=' + token,
+		text: 'reset password'
 	    };
-	    res.locals.smtp.sendMail(mailOptions, function(err, data) {
-		if (err) log.error(err, res.locals.logRequest(req));
-		res.send(err ? 500 : 200, {
-		    session: null,
-		    data: err ? 'Failed to send link, try again later' : 'sent'
-		});
+
+	    res.locals.queue.create('email', {
+		title: 'reset:' + user.attributes.email,
+		emails: emails,
+		subject: 'vacay - password reset',
+		html: html,
+		link: link
+	    }).save();
+
+	    res.send(200, {
+		session: null,
+		data: 'sent'
 	    });
 	}
     });

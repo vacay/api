@@ -5,16 +5,14 @@ var express = require('express'),
     os = require('os'),
     config = require('config-api'),
     log = require('log')(config.log),
+    queue = require('queue')(config.redis),
     routes = require('./routes'),
-    elasticsearch = require('elasticsearch'),
-    nodemailer = require('nodemailer');
+    elasticsearch = require('elasticsearch');
 
 var app = module.exports = express(),
     server = require('http').createServer(app);
 
 var es = new elasticsearch.Client(config.elasticsearch);
-
-var smtp = nodemailer.createTransport('SMTP', config.smtp);
 
 var logRequest = function(req) {
     return {
@@ -41,7 +39,7 @@ app.configure(function () {
 
     app.use(function (req, res, next) {
 	res.locals.es = es;
-	res.locals.smtp = smtp;
+	res.locals.queue = queue;
 	res.locals.logRequest = logRequest;
 	res.locals.env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development';
 	res.header('Access-Control-Allow-Origin', '*');
