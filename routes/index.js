@@ -18,7 +18,7 @@ var auth = require('./auth'),
 
 var authenticate = function(req, res, next) {
     var token = req.param('token');
-    if (token) {
+    if (token && token !== 'undefined') {
 	jwt.verify(token, config.session.secret, function(err, decoded) {
 	    if (err) log.error(err.toString(), res.locals.logRequest(req));
 	    req.user = decoded;
