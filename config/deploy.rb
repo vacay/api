@@ -1,5 +1,5 @@
-# config valid only for Capistrano 3.1
-lock '3.1.0'
+# config valid only for Capistrano 3.0.1
+lock '3.0.1'
 
 set :application, 'vacay'
 set :repo_url, 'git@github.com:vacay/api.git'

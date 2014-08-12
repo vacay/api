@@ -142,12 +142,20 @@ var update = function(req, res) {
 };
 
 var destroy = function(req, res) {
-    //TODO: delete vitamin relations too
-    //TODO: delete from elasticsearch too
     db.model('Prescription')
 	.destroy(req.param('prescription'))
 	.exec(function(err, prescription) {
 	    if (err) log.error(err, res.locals.logRequest(req));
+	    else {
+		res.locals.es.delete({
+		    index: 'vcy',
+		    type: 'prescriptions',
+		    id: req.param('prescription')
+		}, function(err, response) {
+		    if (err) log.error(err, res.locals.logRequest(req));
+		});
+	    }
+
 	    res.send(err ? 500 : 200, {
 		session: req.user,
 		data: err ? err : prescription.toJSON()
