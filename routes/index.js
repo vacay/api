@@ -11,6 +11,7 @@ var auth = require('./auth'),
     subscription = require('./subscription'),
     vitamin = require('./vitamin'),
     crate = require('./crate'),
+    group = require('./group'),
     image = require('./image'),
     config = require('config-api'),
     log = require('log')(config.log),
@@ -141,6 +142,16 @@ module.exports = function (app) {
 	    discussion.loadComment,
 	    discussion.destroyCommentVote);
 
+    app.post('/v1/group/:group/subscription',
+	     isAuthenticated,
+	     group.load,
+	     subscription.create);
+
+    app.del('/v1/group/:group/subscription',
+	    isAuthenticated,
+	    group.load,
+	    subscription.destroy);
+
     app.get('/v1/image',
 	    isAuthenticated,
 	    hasParams(['url']),
@@ -245,12 +256,12 @@ module.exports = function (app) {
 
     app.post('/v1/user/:user/subscription',
 	     isAuthenticated,
-	     hasParams(['prescriber_id']),
+	     user.load,
 	     subscription.create);
 
     app.del('/v1/user/:user/subscription',
 	    isAuthenticated,
-	    hasParams(['prescriber_id']),
+	    user.load,
 	    subscription.destroy);
 
     app.get('/v1/user/:user/subscribers',

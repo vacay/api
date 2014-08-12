@@ -11,7 +11,8 @@ var config = require('config-api'),
 var index = function (req, res) {
     db.model('User').forge({id:req.user.id}).fetch({
 	withRelated: [
-	    'subscriptions'
+	    'subscriptions',
+	    'groups'
 	]
     }).exec(function (err, user) {
 	if (err) {

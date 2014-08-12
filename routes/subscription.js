@@ -5,8 +5,12 @@ var config = require('config-api'),
     db = require('db')(config);
 
 var create = function(req, res) {
+    var prescriber_id = res.locals.user ? res.locals.user.id : res.locals.group.id;
+    var prescriber_type = res.locals.user ? 'users' : 'groups';
+
     db.knex('subscriptions').insert({
-	prescriber_id: req.param('prescriber_id'),
+	prescriber_id: prescriber_id,
+	prescriber_type: prescriber_type,
 	subscriber_id: req.user.id,
 	created_at: new Date(),
 	updated_at: new Date()
@@ -20,8 +24,12 @@ var create = function(req, res) {
 };
 
 var destroy = function(req, res) {
+    var prescriber_id = res.locals.user ? res.locals.user.id : res.locals.group.id;
+    var prescriber_type = res.locals.user ? 'users' : 'groups';
+
     db.knex('subscriptions').where({
-	prescriber_id: req.param('prescriber_id'),
+	prescriber_id: prescriber_id,
+	prescriber_type: prescriber_type,
 	subscriber_id: req.user.id
     }).del().exec(function(err, numRows) {
 	if (err) log.error(err, res.locals.logRequest(req));
