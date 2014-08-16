@@ -11,16 +11,18 @@ var browse = function(req, res) {
 	id: req.user.id
     }).related('crate').query(function(qb) {
 	if (query) {
-	    var terms = query.split(" ");
-	    for (var i=0; i<terms.length; i++) {
-		if (i === 0) {
-		    qb.where('title', 'LIKE', '%' + terms[i] + '%');
-		} else {
-		    qb.orWhere('title', 'LIKE', '%' + terms[i] + '%');
+	    qb.where(function() {
+		var terms = query.split(" ");
+		for (var i=0; i<terms.length; i++) {
+		    if (i === 0) {
+			this.where('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    } else {
+			this.orWhere('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    }
 		}
-	    }
+	    });
 	}
-	qb.limit(50).offset(offset).orderBy('created_at', 'desc');
+	qb.limit(50).offset(offset).groupBy('vitamins.id').orderBy('crates.created_at', 'desc');
     }).fetch({
 	withRelated: [
 	    'hosts',
