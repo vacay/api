@@ -17,7 +17,7 @@
     "dependencies": {
 	"express": "3.4.8",
 	"jsonwebtoken": "0.1.0",
-	"db": "https://api.github.com/repos/vacay/db/tarball/0.3.0?access_token=27fa4fbedc7cc6d98a2abae1d99368920ba2ef23",
+	"db": "https://api.github.com/repos/vacay/db/tarball/0.3.1?access_token=27fa4fbedc7cc6d98a2abae1d99368920ba2ef23",
 	"URIjs": "1.12.0",
 	"async": "0.2.10",
 	"uuid": "1.4.1",
