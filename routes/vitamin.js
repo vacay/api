@@ -88,29 +88,32 @@ var create = function(req, res) {
 };
 
 var read = function(req, res) {
-    res.locals.vitamin.fetch({
-	withRelated: [
-	    'hosts',
-	    {
-		'crates': function(qb) {
-		    qb.where('user_id', req.user.id);
-		}
-	    },
-	    'prescriptions',
-	    'prescriptions.prescriber',
-	    'prescriptions.vitamins',
-	    'prescriptions.vitamins.hosts',
-	    {
-		'prescriptions.vitamins.crates': function(qb) {
-		    qb.where('user_id', req.user.id);
-		}
-	    }
-	]
-    }).exec(function(err, vitamin) {
+    async.parallel({
+
+	vitamin: function(cb) {
+	    res.locals.vitamin.fetch({
+		withRelated: [
+		    'hosts',
+		    {
+			'crates': function(qb) {
+			    qb.where('user_id', req.user.id);
+			}
+		    },
+		    'pages'
+		]
+	    }).exec(cb);
+	},
+
+	prescribers: function(cb) {
+	    res.locals.vitamin.prescribers().exec(cb);
+	}
+
+    }, function(err, results) {
 	if (err) log.error(err, res.locals.logRequest(req));
+	results.vitamin.set({prescribers: results.prescribers});
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err ? err : vitamin.toJSON()
+	    data: err ? err : results.vitamin.toJSON()
 	});
     });
 };
