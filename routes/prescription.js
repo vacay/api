@@ -59,6 +59,11 @@ var create = function(req, res) {
 
 	function(prescription, callback) {
 
+	    if (!req.param('vitamins')) {
+		callback(null, prescription);
+		return;
+	    }
+
 	    var vitamins = req.param('vitamins');
 	    for (var i=0; i<vitamins.length; i++) {
 		vitamins[i].prescription_id = prescription.id;
@@ -97,17 +102,26 @@ var publish = function(req, res) {
 
 var update = function(req, res) {
     //TODO: validate description length
+
+    var params = {};
+    if (typeof req.param('image') !== 'undefined') params.image_url = req.param('image');
+    if (typeof req.param('description') !== 'undefined') params.description = req.param('description');
+
+    params.id = req.param('prescription');
+
     async.waterfall([
 
 	function(callback) {
-	    db.model('Prescription').edit({
-		id: req.param('prescription'),
-		image_url: req.param('image') || null,
-		description: req.param('description') || null
-	    }).exec(callback);
+	    db.model('Prescription').edit(params).exec(callback);
 	},
 	
 	function(prescription, callback) {
+
+	    if (!req.param('vitamins')) {
+		callback(null, prescription);
+		return;
+	    }
+
 	    db.knex('prescriptions_vitamins')
 		.where('prescription_id', prescription.id)
 		.del()
@@ -118,7 +132,12 @@ var update = function(req, res) {
 
 	function(prescription, callback) {
 
-	    var vitamins = req.param('vitamins') || [];
+	    if (!req.param('vitamins')) {
+		callback(null, prescription);
+		return;
+	    }
+
+	    var vitamins = req.param('vitamins');
 	    for (var i=0; i<vitamins.length; i++) {
 		vitamins[i].prescription_id = prescription.id;
 	    }
