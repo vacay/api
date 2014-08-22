@@ -3,7 +3,7 @@
 module.exports = {
     title: 'vacay',
     host: 'localhost',
-    url: 'http://vacay.io',
+    url: 'https://vacay.io',
     port: 80,
     ssl: true,
     tmp: '/home/deploy/vacay/shared/tmp',

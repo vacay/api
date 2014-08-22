@@ -171,7 +171,7 @@ var destroy = function(req, res) {
 		    type: 'prescriptions',
 		    id: req.param('prescription')
 		}, function(err, response) {
-		    if (err) log.error(err, res.locals.logRequest(req));
+		    if (err.message !== 'Not Found') log.error(err, res.locals.logRequest(req));
 		});
 	    }
 
