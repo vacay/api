@@ -59,5 +59,12 @@ module.exports = {
 
     session: {
 	secret: 'hr{@"ca69EfN;*>J7wy:-yVs&^}]b1C]&96N|[[{^xb&<B>jp*%D[[7gEqaU]%Q}'
-    }    
+    },
+
+    stats: {
+	prefix: 'vacay.api',
+	host: 'ip-172-31-31-5.ec2.internal',
+	port: 8125,
+	mock: false
+    }
 };

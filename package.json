@@ -25,7 +25,9 @@
 	"log": "https://api.github.com/repos/vacay/log/tarball/0.0.1",
 	"request": "2.34.0",
 	"elasticsearch": "2.1.1",
-	"queue": "vacay/queue"
+	"queue": "vacay/queue",
+	"on-headers": "1.0.0",
+	"node-statsd": "0.0.7"
     },
     "engines": {
 	"node": "0.10.x",

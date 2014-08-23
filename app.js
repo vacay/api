@@ -7,7 +7,11 @@ var express = require('express'),
     log = require('log')(config.log),
     queue = require('queue')(config.redis),
     routes = require('./routes'),
-    elasticsearch = require('elasticsearch');
+    elasticsearch = require('elasticsearch'),
+    onHeaders = require('on-headers'),
+    StatsD = require('node-statsd').StatsD;
+
+var stats = new StatsD(config.stats);
 
 var app = module.exports = express(),
     server = require('http').createServer(app);
@@ -15,6 +19,7 @@ var app = module.exports = express(),
 var es = new elasticsearch.Client(config.elasticsearch);
 
 var logRequest = function(req) {
+    stats.increment('error');
     return {
 	url: req.url,
 	headers: req.headers,
@@ -26,6 +31,8 @@ var logRequest = function(req) {
 };
 
 app.configure(function () {
+
+    app.disable('x-powered-by');
 
     app.use(express.logger({
 	format: config.log.express_format
@@ -63,6 +70,18 @@ app.configure(function () {
 	    }
 	});
     }
+
+    app.use(function(req, res, next) {
+	var start = process.hrtime();;
+
+	onHeaders(res, function() {
+	    var diff = process.hrtime(start);
+	    var ms = diff[0] * 1e3 + diff[1] * 1e-6;
+	    stats.timing('response', ms.toFixed());
+	});
+
+	next();
+    });
 
     app.use(app.router);
 
