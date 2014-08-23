@@ -51,7 +51,7 @@ module.exports = {
     },
 
     stats: {
-	prefix: 'vacay.api',
+	prefix: 'vacay.api.',
 	host: 'localhost',
 	port: 8125,
 	mock: true

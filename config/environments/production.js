@@ -62,7 +62,7 @@ module.exports = {
     },
 
     stats: {
-	prefix: 'vacay.api',
+	prefix: 'vacay.api.',
 	host: 'ip-172-31-31-5.ec2.internal',
 	port: 8125,
 	mock: false
