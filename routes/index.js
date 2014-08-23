@@ -136,6 +136,11 @@ module.exports = function (app) {
 	     discussion.loadComment,
 	     discussion.createCommentVote);
 
+    app.del('/v1/discussion/:discussion/comment/:comment/vote',
+	    isAuthenticated,
+	    discussion.loadComment,
+	    discussion.destroyCommentVote);
+
     app.get('/v1/image',
 	    isAuthenticated,
 	    hasParams(['url']),

@@ -247,6 +247,20 @@ var createCommentVote = function(req, res) {
     });
 };
 
+var destroyCommentVote = function(req, res) {
+    db.model('Vote').forge().query('where', {
+	user_id: req.user.id,
+	voteable_id: res.locals.comment.id,
+	voteable_type: 'comments'
+    }).destroy().exec(function(err, vote) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err ? err : vote.toJSON()
+	});
+    });
+};
+
 module.exports = {
     browse: browse,
     load: load,
@@ -258,5 +272,6 @@ module.exports = {
     loadComment: loadComment,
     createComment: createComment,
     updateComment: updateComment,
-    createCommentVote: createCommentVote
+    createCommentVote: createCommentVote,
+    destroyCommentVote: destroyCommentVote
 };
