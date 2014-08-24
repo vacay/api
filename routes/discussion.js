@@ -48,6 +48,7 @@ var browse = function(req, res) {
 	    withRelated: [
 		'user',
 		'comments',
+		'comments.votes',
 		'votes'
 	    ]
 	}).exec(function(err, discussions) {
