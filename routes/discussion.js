@@ -137,11 +137,15 @@ var createComment = function(req, res) {
 	body: req.param('body'),
 	discussion_id: req.param('discussion'),
 	parent_id: req.param('parent_id') || null
-    }).exec(function(err, discussion) {
+    }).exec(function(err, comment) {
 	if (err) log.error(err, res.locals.logRequest(req));
+	comment.set({
+	    votes: [],
+	    comments: []
+	});
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: discussion.toJSON()
+	    data: comment.toJSON()
 	});
     });
 
