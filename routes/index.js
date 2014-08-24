@@ -297,21 +297,6 @@ module.exports = function (app) {
 	    vitamin.load,
 	    vitamin.update);
 
-    app.get('/v1/vitamin/:vitamin/summary',
-	    isAuthenticated,
-	    vitamin.load,
-	    vitamin.summary);
-
-    app.get('/v1/vitamin/:vitamin/prescriptions',
-	    isAuthenticated,
-	    vitamin.load,
-	    vitamin.prescriptions);
-
-    app.get('/v1/vitamin/:vitamin/pages',
-	    isAuthenticated,
-	    vitamin.load,
-	    vitamin.pages);
-
     app.post('/v1/logger', isAuthenticated, hasParams(['error']), function(req, res) {
 	var error = req.param('error');
 	error.user = req.user;

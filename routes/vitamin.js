@@ -36,40 +36,6 @@ var load = function(req, res, next) {
     });
 };
 
-var summary = function(req, res) {
-    async.waterfall([
-	function(callback) {
-	    db.knex('prescriptions')
-		.select(db.knex.raw('count(subscriptions.prescriber_id) as score, prescriptions.prescriber_id'))
-		.innerJoin('prescriptions_vitamins', 'prescriptions.id', 'prescriptions_vitamins.prescription_id')
-		.leftJoin('subscriptions', 'prescriptions.prescriber_id', 'subscriptions.prescriber_id')
-		.where('prescriptions_vitamins.vitamin_id', res.locals.vitamin.id)
-		.orderBy('score', 'desc')
-		.limit(8)
-		.exec(callback);
-	},
-
-	function(prescribers, callback) {
-	    var ids = [];
-	    for (var i=0; i<prescribers.length; i++) {
-		ids.push(prescribers[i].prescriber_id);
-	    }
-	    db.model('User').collection().query('whereIn', 'id', ids).fetch().exec(callback);
-	}
-
-	    ], function(err, users) {
-		if (err) log.error(err, res.locals.logRequest(req));
-
-		var vitamin = res.locals.vitamin.toJSON();
-		vitamin.users = users.toJSON();
-
-		res.send(err ? 500 : 200, {
-		    session: req.user,
-		    data: err ? err : vitamin
-		});
-	    });
-};
-
 var create = function(req, res) {
     db.model('Vitamin').findOrCreate({
 	url: req.param('url'),
@@ -125,51 +91,6 @@ var update = function(req, res) {
     }).exec(function(err, vitamin) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
-	    session: req.user,
-	    data: err ? err : vitamin.toJSON()
-	});
-    });
-};
-
-var prescriptions = function(req, res) {
-    var offset = parseInt(req.param('offset'), 10) || 0;
-    res.locals.vitamin.fetch({
-	withRelated: [
-	    {
-		'prescriptions': function(qb) {
-		    qb.whereNull('prescriptions.recipient_id')
-			.orderBy('prescriptions.created_at', 'desc')
-			.limit(20)
-			.offset(offset);
-		}
-	    },
-	    'prescriptions.prescriber',
-	    'prescriptions.vitamins',
-	    'prescriptions.vitamins.hosts',
-	    {
-		'prescriptions.vitamins.crates': function(qb) {
-		    qb.where('user_id', req.user.id);
-		}
-	    }
-	]
-    }).exec(function(err, vitamin) {
-	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
-	    session: req.user,
-	    data: err ? err : vitamin.toJSON()
-	});
-    });
-};
-
-var pages = function(req, res) {
-    var offset = parseInt(req.param('offset'), 10) || 0;
-    res.locals.vitamin.fetch({
-	withRelated: [
-	    'pages'
-	]
-    }).exec(function(err, vitamin) {
-	if (err) log.error(err, res.locals.logRequest(req));
-	res.end(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : vitamin.toJSON()
 	});
@@ -269,9 +190,6 @@ module.exports = {
     create: create,
     read: read,
     update: update,
-    prescriptions: prescriptions,
-    pages: pages,
-    summary: summary,
     browse: browse,
     sync: sync
 };
