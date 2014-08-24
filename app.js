@@ -54,7 +54,7 @@ app.configure(function () {
 	res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
 
 	// intercept OPTIONS method
-	if ('OPTIONS' === req.method) {
+	if ('OPTIONS' === req.method || '/health_check' === req.path) {
 	    res.send(200);
 	} else {
 	    next();
@@ -63,7 +63,7 @@ app.configure(function () {
 
     if (config.ssl) {
 	app.use(function(req, res, next) {
-	    if (req.path !== '/health_check' && req.get('X-Forwarded-Proto') !== 'https') {
+	    if (req.get('X-Forwarded-Proto') !== 'https') {
 		res.redirect('https://' + req.host + req.url);
 	    } else {
 		next();

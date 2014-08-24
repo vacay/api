@@ -312,7 +312,10 @@ module.exports = function (app) {
 	    vitamin.load,
 	    vitamin.pages);
 
-    app.get('/health_check', function(req, res) {
+    app.post('/v1/logger', isAuthenticated, hasParams(['error']), function(req, res) {
+	var error = req.param('error');
+	error.user = req.user;
+	log.error(error.errorMessage, error);
 	res.send(200);
     });
 
