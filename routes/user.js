@@ -33,7 +33,7 @@ var read = function(req, res) {
 	withRelated: [
 	    {
 		'prescriptions': function(qb) {
-		    qb.whereNotNull('published_at').whereNull('recipient_id').limit(20).orderBy('prescriptions.published_at', 'desc');
+		    qb.whereNotNull('published_at').limit(20).orderBy('prescriptions.published_at', 'desc');
 		}
 	    },
 	    'prescriptions.prescriber',
@@ -108,7 +108,6 @@ var prescriptions = function(req, res) {
     var offset = parseInt(req.param('offset'), 10) || 0;
     res.locals.user.prescriptions().query(function(qb) {
 	qb.whereNotNull('published_at')
-	    .whereNull('prescriptions.recipient_id')
 	    .orderBy('prescriptions.published_at', 'desc')
 	    .limit(20)
 	    .offset(offset);

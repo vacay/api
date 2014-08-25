@@ -52,8 +52,7 @@ var create = function(req, res) {
 	    db.model('Prescription').create({
 		image_url: req.param('image') || null,
 		description: req.param('description') || null,
-		prescriber_id: req.user.id,
-		recipient_id: req.param('recipient') || null
+		prescriber_id: req.user.id
 	    }).exec(callback);
 	},
 
