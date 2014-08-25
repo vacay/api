@@ -142,6 +142,16 @@ module.exports = function (app) {
 	    discussion.loadComment,
 	    discussion.destroyCommentVote);
 
+    app.post('/v1/group',
+	     isAuthenticated,
+	     hasParams(['name', 'description']),
+	     group.create);
+
+    app.get('/v1/group/:group',
+	    isAuthenticated,
+	    group.load,
+	    group.read);
+
     app.post('/v1/group/:group/subscription',
 	     isAuthenticated,
 	     group.load,
@@ -151,6 +161,10 @@ module.exports = function (app) {
 	    isAuthenticated,
 	    group.load,
 	    subscription.destroy);
+
+    app.get('/v1/groups',
+	    isAuthenticated,
+	    group.browse);
 
     app.get('/v1/image',
 	    isAuthenticated,
