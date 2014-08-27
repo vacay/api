@@ -17,7 +17,7 @@
     "dependencies": {
 	"express": "3.4.8",
 	"jsonwebtoken": "0.1.0",
-	"db": "https://api.github.com/repos/vacay/db/tarball/0.4.4?access_token=27fa4fbedc7cc6d98a2abae1d99368920ba2ef23",
+	"db": "https://api.github.com/repos/vacay/db/tarball/0.4.5?access_token=27fa4fbedc7cc6d98a2abae1d99368920ba2ef23",
 	"URIjs": "1.12.0",
 	"async": "0.2.10",
 	"uuid": "1.4.1",
@@ -25,7 +25,7 @@
 	"log": "https://api.github.com/repos/vacay/log/tarball/0.0.1",
 	"request": "2.34.0",
 	"elasticsearch": "2.1.1",
-	"queue": "vacay/queue",
+	"queue": "https://api.github.com/repos/vacay/queue/tarball/0.1.0?access_token=27fa4fbedc7cc6d98a2abae1d99368920ba2ef23",
 	"on-headers": "1.0.0",
 	"node-statsd": "0.0.7"
     },
