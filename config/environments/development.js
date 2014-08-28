@@ -40,10 +40,16 @@ module.exports = {
 	user: 'root',
 	charset  : 'UTF8_GENERAL_CI'
     },
+
+    queue: {
     
-    redis: {
-	host: '127.0.0.1',
-	port: 6379
+	redis: {
+	    host: '127.0.0.1',
+	    port: 6379
+	},
+
+	disableSearch: true
+
     },
     
     session: {

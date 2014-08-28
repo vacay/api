@@ -51,10 +51,16 @@ module.exports = {
 	password: 'Danger1$'
     },
 
-    redis: {
-	host: 'ip-172-31-31-5.ec2.internal',
-	port: 6379,
-	pass: 'Danger1$'
+    queue: {
+
+	redis: {
+	    host: 'ip-172-31-31-5.ec2.internal',
+	    port: 6379,
+	    auth: 'Danger1$'
+	},
+
+	disableSearch: true
+
     },
 
     session: {

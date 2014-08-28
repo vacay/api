@@ -5,11 +5,13 @@ var express = require('express'),
     os = require('os'),
     config = require('config-api'),
     log = require('log')(config.log),
-    queue = require('queue')(config.redis),
+    kue = require('kue'),
     routes = require('./routes'),
     elasticsearch = require('elasticsearch'),
     onHeaders = require('on-headers'),
     StatsD = require('node-statsd').StatsD;
+
+var queue = kue.createQueue(config.queue);
 
 var stats = new StatsD(config.stats);
 
