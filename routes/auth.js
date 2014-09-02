@@ -133,7 +133,7 @@ module.exports.requestReset = function(req, res) {
 		subject: 'vacay - password reset',
 		html: html,
 		link: link
-	    }).save();
+	    }).removeOnComplete(true).save();
 
 	    res.send(200, {
 		session: null,

@@ -12,7 +12,7 @@ var create = function(req, res) {
 	replyTo: req.param('email'),
 	subject: subject,
 	html: html
-    }).save();
+    }).removeOnComplete(true).save();
 
     res.send(200, {
 	session: req.user,
