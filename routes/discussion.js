@@ -42,13 +42,14 @@ var browse = function(req, res) {
     db.model('Discussion')
 	.collection()
 	.query(function(qb) {
-	    qb.limit(20).offset(offset).orderBy('updated_at', 'desc');
+	    qb.count('comments.id as total_comments')
+		.leftJoin('comments', 'discussions.id', 'comments.discussion_id')
+		.groupBy('discussions.id')
+		.limit(20).offset(offset).orderBy('updated_at', 'desc');
 	})
 	.fetch({
 	    withRelated: [
 		'user',
-		'comments',
-		'comments.votes',
 		'votes'
 	    ]
 	}).exec(function(err, discussions) {
@@ -88,11 +89,13 @@ var read = function(req, res) {
 	]
     }).exec(function(err, discussion) {
 	if (err) log.error(err, res.locals.logRequest(req));
+
 	var data = discussion ? discussion.toJSON() : {};
 	if (data) {
+	    data.total_comments = data.comments.length;
 	    data.comments = nestComments(data.comments);
 	}
-	console.log(data);
+
 	res.send(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : data
