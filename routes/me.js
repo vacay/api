@@ -109,7 +109,9 @@ var drafts = function(req, res) {
 		    'vitamins.crates': function(qb) {
 			qb.where('user_id', req.user.id);
 		    }
-		}
+		},
+		'users',
+		'groups'
 	    ]
 	}).exec(function(err, prescriptions) {
 	    if (err) log.error(err, res.locals.logRequest(req));

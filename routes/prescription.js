@@ -352,7 +352,9 @@ var browse = function(req, res) {
 			    'vitamins.crates': function(qb) {
 				qb.where('user_id', req.user.id);
 			    }
-			}
+			},
+			'users',
+			'groups'
 		    ]
 		}).exec(callback);
 	}
