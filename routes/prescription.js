@@ -47,8 +47,26 @@ var read = function(req, res) {
 };
 
 var create = function(req, res) {
-    //TODO: validate description length
+
+    var params = {};
+
+    if (typeof req.param('image') !== 'undefined') params.image_url = req.param('image');
+    if (typeof req.param('description') !== 'undefined') params.description = req.param('description');
+    if (typeof req.param('published_at') !== 'undefined') params.published_at = new Date();
+
+    params.prescriber_id = req.user.id;
+
     async.waterfall([
+
+	function(callback) {
+	    if (params.description.length > 500) {
+		callback('prescription description length of ' + params.description.length + ' is greater than limit of 500');
+	    } else if (req.param('vitamins').length > 100) {
+		callback('prescription vitamin length of ' + req.param('vitamins').length + ' is greater than limit of 100');
+	    } else {
+		callback();
+	    }
+	},
 
 	function(callback) {	    
 	    db.model('Prescription').create({
@@ -130,29 +148,26 @@ var create = function(req, res) {
     });
 };
 
-var publish = function(req, res) {
-    db.model('Prescription').edit({
-	id: req.param('prescription'),
-	published_at: new Date()
-    }).exec(function(err, prescription) {
-	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
-	    session: req.user,
-	    data: err ? err : prescription.toJSON()
-	});
-    });
-};
-
 var update = function(req, res) {
-    //TODO: validate description length
 
     var params = {};
     if (typeof req.param('image') !== 'undefined') params.image_url = req.param('image');
     if (typeof req.param('description') !== 'undefined') params.description = req.param('description');
+    if (typeof req.param('published_at') !== 'undefined') params.published_at = new Date();
 
     params.id = req.param('prescription');
 
     async.waterfall([
+
+	function(callback) {
+	    if (params.description.length > 500) {
+		callback('prescription description length: ' + params.description.length + ' greater than limit of 500');
+	    } else if (req.param('vitamins').length > 100) {
+		callback('prescription vitamin length: ' + req.param('vitamins').length + ' greater than limit of 100');
+	    } else {
+		callback();
+	    }
+	},
 
 	function(callback) {
 	    db.model('Prescription').edit(params).exec(callback);
@@ -390,7 +405,6 @@ module.exports = {
     read: read,
     create: create,
     update: update,
-    publish: publish,
     destroy: destroy,
     browse: browse
 };

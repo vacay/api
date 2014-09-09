@@ -230,7 +230,6 @@ module.exports = function (app) {
 	    prescription.browse);
 
     //TODO: validate vitamins to make sure they exist
-    //TODO: validate vitamin length
     app.post('/v1/prescription',
 	     isAuthenticated,
 	     prescription.create);
@@ -239,12 +238,7 @@ module.exports = function (app) {
 	    prescription.load,
 	    prescription.read);
 
-    app.post('/v1/prescription/:prescription/publish',
-	     isAuthenticated,
-	     prescription.publish);
-
     //TODO: validate vitamins to make sure they exist
-    //TODO: validate vitamin length
     app.put('/v1/prescription/:prescription',
 	    isAuthenticated,
 	    prescription.update);

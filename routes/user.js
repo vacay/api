@@ -43,7 +43,9 @@ var read = function(req, res) {
 		'prescriptions.vitamins.crates': function(qb) {
 		    qb.where('user_id', req.user.id);
 		}
-	    }
+	    },
+	    'prescriptions.users',
+	    'prescriptions.groups'
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err, res.locals.logRequest(req));
@@ -128,7 +130,9 @@ var prescriptions = function(req, res) {
 		'vitamins.crates': function(qb) {
 		    qb.where('user_id', req.user.id);
 		}
-	    }
+	    },
+	    'users',
+	    'groups'
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err, res.locals.logRequest(req));
