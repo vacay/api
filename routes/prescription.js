@@ -59,9 +59,9 @@ var create = function(req, res) {
     async.waterfall([
 
 	function(callback) {
-	    if (params.description.length > 500) {
+	    if (params.description && params.description.length > 500) {
 		callback('prescription description length of ' + params.description.length + ' is greater than limit of 500');
-	    } else if (req.param('vitamins').length > 100) {
+	    } else if (req.param('vitamins') && req.param('vitamins').length > 100) {
 		callback('prescription vitamin length of ' + req.param('vitamins').length + ' is greater than limit of 100');
 	    } else {
 		callback();
@@ -69,11 +69,7 @@ var create = function(req, res) {
 	},
 
 	function(callback) {	    
-	    db.model('Prescription').create({
-		image_url: req.param('image') || null,
-		description: req.param('description') || null,
-		prescriber_id: req.user.id
-	    }).exec(callback);
+	    db.model('Prescription').create(params).exec(callback);
 	},
 
 	function(prescription, callback) {
@@ -160,9 +156,9 @@ var update = function(req, res) {
     async.waterfall([
 
 	function(callback) {
-	    if (params.description.length > 500) {
+	    if (params.description && params.description.length > 500) {
 		callback('prescription description length: ' + params.description.length + ' greater than limit of 500');
-	    } else if (req.param('vitamins').length > 100) {
+	    } else if (req.param('vitamins') && req.param('vitamins').length > 100) {
 		callback('prescription vitamin length: ' + req.param('vitamins').length + ' greater than limit of 100');
 	    } else {
 		callback();
