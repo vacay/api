@@ -181,17 +181,21 @@ var update = function(req, res) {
 	    }
 
 	    var vitamins = req.param('vitamins');
-	    for (var i=0; i<vitamins.length; i++) {
-		vitamins[i].prescription_id = prescription.id;
-	    }
 
 	    if (vitamins.length) {
+
+		for (var i=0; i<vitamins.length; i++) {
+		    vitamins[i].prescription_id = prescription.id;
+		}
+
 		db.knex('prescriptions_vitamins').insert(vitamins).exec(function(err) {
 		    callback(err, prescription);
 		});
+
 	    } else {
 		callback(null, prescription);
 	    }
+
 	},
 
 	function(prescription, callback) {
@@ -217,14 +221,17 @@ var update = function(req, res) {
 	    }
 
 	    var users = req.param('users');
-	    for (var i=0; i<users.length; i++) {
-		users[i].prescription_id = prescription.id;
-	    }
 
 	    if (users.length) {
+
+		for (var i=0; i<users.length; i++) {
+		    users[i].prescription_id = prescription.id;
+		}
+
 		db.knex('prescriptions_users').insert(users).exec(function(err) {
 		    callback(err, prescription);
 		});
+
 	    } else {
 		callback(null, prescription);
 	    }
@@ -253,17 +260,21 @@ var update = function(req, res) {
 	    }
 
 	    var groups = req.param('groups');
-	    for (var i=0; i<groups.length; i++) {
-		groups[i].prescription_id = prescription.id;
-	    }
 
 	    if (groups.length) {
+
+		for (var i=0; i<groups.length; i++) {
+		    groups[i].prescription_id = prescription.id;
+		}
+
 		db.knex('prescriptions_groups').insert(groups).exec(function(err) {
 		    callback(err, prescription);
 		});
+
 	    } else {
 		callback(null, prescription);
 	    }
+
 	}
 
     ], function(err, prescription) {
