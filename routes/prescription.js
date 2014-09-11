@@ -30,8 +30,13 @@ var read = function(req, res) {
 	    'vitamins',
 	    'vitamins.hosts',
 	    {
-		'vitamins.crates': function(qb) {
-		    qb.where('user_id', req.user ? req.user.id : 0);
+		'vitamins.tags': function(qb) {
+		    qb.where('tags.user_id', req.user ? req.user.id : 0);
+		}
+	    },
+	    {
+		'vitamins.craters': function(qb) {
+		    qb.where('crates.user_id', req.user ? req.user.id : 0);
 		}
 	    },
 	    'users',
@@ -371,8 +376,13 @@ var browse = function(req, res) {
 			'vitamins',
 			'vitamins.hosts',
 			{
-			    'vitamins.crates': function(qb) {
-				qb.where('user_id', req.user.id);
+			    'vitamins.tags': function(qb) {
+				qb.where('tags.user_id', req.user.id);
+			    }
+			},
+			{
+			    'vitamins.craters': function(qb) {
+				qb.where('crates.user_id', req.user.id);
 			    }
 			},
 			'users',

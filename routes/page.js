@@ -56,16 +56,27 @@ var read = function(req, res) {
 	    },
 	    'vitamins.hosts',
 	    {
-		'vitamins.crates': function(qb) {
-		    qb.where('user_id', req.user.id);
+		'vitamins.tags': function(qb) {
+		    qb.where('tags.user_id', req.user.id);
+		}
+	    },
+	    {
+		'vitamins.craters': function(qb) {
+		    qb.where('crates.user_id', req.user.id);
 		}
 	    }
 	]
     }).exec(function(err, page) {
 	if (err) log.error(err, res.locals.logRequest(req));
+	else {
+	    var data = page.toJSON();
+	    data.crates = data.craters; //deprecated - update chrome ext
+	    console.log(data);
+	}
+
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err ? err : page.toJSON()
+	    data: err ? err : data
 	});
     });
 };

@@ -10,8 +10,9 @@ var auth = require('./auth'),
     discussion = require('./discussion'),
     subscription = require('./subscription'),
     vitamin = require('./vitamin'),
-    crate = require('./crate'),
+    tag = require('./tag'),
     group = require('./group'),
+    crate = require('./crate'),
     image = require('./image'),
     config = require('config-api'),
     log = require('log')(config.log),
@@ -179,6 +180,10 @@ module.exports = function (app) {
 	    isAuthenticated,
 	    crate.browse);
 
+    app.get('/v1/me/tags',
+	    isAuthenticated,
+	    me.tags);
+
     app.get('/v1/me/inbox',
 	    isAuthenticated,
 	    me.inbox);
@@ -204,6 +209,7 @@ module.exports = function (app) {
 	     hasParams(['name', 'email', 'subject', 'body']),
 	     message.create);
 
+    //backward compatible for chrome ext
     app.post('/v1/page',
 	     isAuthenticated,
 	     hasParams(['url']),
@@ -305,9 +311,21 @@ module.exports = function (app) {
 	     vitamin.load,
 	     crate.create);
 
+    app.post('/v1/vitamin/:vitamin/tag',
+	     isAuthenticated,
+	     vitamin.load,
+	     crate.findOrCreate,
+	     tag.create);
+
     app.del('/v1/vitamin/:vitamin/crate',
 	    isAuthenticated,
+	    vitamin.load,
 	    crate.destroy);
+
+    app.del('/v1/vitamin/:vitamin/tag',
+	    isAuthenticated,
+	    vitamin.load,
+	    tag.destroy);
 
     app.put('/v1/vitamin/:vitamin',
 	    isAuthenticated,

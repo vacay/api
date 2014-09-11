@@ -106,8 +106,13 @@ var drafts = function(req, res) {
 		'vitamins',
 		'vitamins.hosts',
 		{
-		    'vitamins.crates': function(qb) {
-			qb.where('user_id', req.user.id);
+		    'vitamins.tags': function(qb) {
+			qb.where('tags.user_id', req.user.id);
+		    }
+		},
+		{
+		    'vitamins.craters': function(qb) {
+			qb.where('crates.user_id', req.user.id);
 		    }
 		},
 		'users',
@@ -147,8 +152,13 @@ var tracker = function(req, res) {
 	    'hosts',
 	    'pages',
 	    {
-		crates: function(qb) {
-		    qb.where('user_id', req.user.id);
+		tags: function(qb) {
+		    qb.where('tags.user_id', req.user.id);
+		}
+	    },
+	    {
+		craters: function(qb) {
+		    qb.where('crates.user_id', req.user.id);
 		}
 	    }
 	]
@@ -161,11 +171,23 @@ var tracker = function(req, res) {
     });
 };
 
+var tags = function(req, res) {
+    db.model('User').forge({id: req.user.id}).related('tags').fetch().exec(function(err, data) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err || (!data ? [] : data.toJSON())
+	});
+    });
+};
+
+
 module.exports = {
     index: index,
     inbox: inbox,
     upload: upload,
     drafts: drafts,
     pages: pages,
-    tracker: tracker
+    tracker: tracker,
+    tags: tags
 };

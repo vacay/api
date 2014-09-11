@@ -63,8 +63,13 @@ var read = function(req, res) {
 	    'prescriptions.vitamins',
 	    'prescriptions.vitamins.hosts',
 	    {
-		'prescriptions.vitamins.crates': function(qb) {
-		    qb.where('user_id', req.user.id);
+		'prescriptions.vitamins.craters': function(qb) {
+		    qb.where('crates.user_id', req.user.id);
+		}
+	    },
+	    {
+		'prescriptions.vitamins.tags': function(qb) {
+		    qb.where('tags.user_id', req.user.id);
 		}
 	    }
 	]

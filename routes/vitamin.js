@@ -9,14 +9,6 @@ var config = require('config-api'),
 var load = function(req, res, next) {
     db.model('Vitamin').findOne({
 	id: req.param('vitamin')
-    }, {
-	withRelated: [
-	    {
-		'crates': function(qb) {
-		    qb.where('user_id', req.user.id);
-		}
-	    }
-	]
     }).exec(function(err, vitamin) {
 	if (err) {
 	    log.error(err, res.locals.logRequest(req));
@@ -61,10 +53,11 @@ var read = function(req, res) {
 		withRelated: [
 		    'hosts',
 		    {
-			'crates': function(qb) {
-			    qb.where('user_id', req.user.id);
+			'tags': function(qb) {
+			    qb.where('tags.user_id', req.user.id);
 			}
 		    },
+		    'craters',
 		    'pages'
 		]
 	    }).exec(cb);
@@ -147,8 +140,13 @@ var browse = function(req, res) {
 		.fetch({ withRelated: [
 		    'hosts',
 		    {
-			'crates': function(qb) {
-			    qb.where('user_id', req.user.id);
+			'tags': function(qb) {
+			    qb.where('tags.user_id', req.user.id);
+			}
+		    },
+		    {
+			'craters': function(qb) {
+			    qb.where('crates.user_id', req.user.id);
 			}
 		    }
 		] }).exec(callback);
