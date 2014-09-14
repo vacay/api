@@ -67,11 +67,12 @@ var read = function(req, res) {
 	    }
 	]
     }).exec(function(err, page) {
+	var data;
+
 	if (err) log.error(err, res.locals.logRequest(req));
 	else {
-	    var data = page.toJSON();
+	    data = page.toJSON();
 	    data.crates = data.craters; //deprecated - update chrome ext
-	    console.log(data);
 	}
 
 	res.send(err ? 500 : 200, {

@@ -1,7 +1,6 @@
-/* global require, module, __dirname */
+/* global require, module */
 
 var auth = require('./auth'),
-    path = require('path'),
     me = require('./me'),
     message = require('./message'),
     page = require('./page'),
@@ -265,7 +264,7 @@ module.exports = function (app) {
     app.put('/v1/user/:user',
 	    isAuthenticated,
 	    user.load,
-	    user.update); 
+	    user.update);
 
     app.post('/v1/user/:user/subscription',
 	     isAuthenticated,

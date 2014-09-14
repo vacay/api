@@ -73,7 +73,7 @@ var create = function(req, res) {
 	    }
 	},
 
-	function(callback) {	    
+	function(callback) {
 	    db.model('Prescription').create(params).exec(callback);
 	},
 
@@ -312,7 +312,7 @@ var destroy = function(req, res) {
 		    index: 'vcy',
 		    type: 'prescriptions',
 		    id: req.param('prescription')
-		}, function(err2, response) {
+		}, function(err2) {
 		    if (err2 && err2.message !== 'Not Found') log.error(err2, res.locals.logRequest(req));
 		});
 	    }
@@ -393,15 +393,17 @@ var browse = function(req, res) {
 
     ], function(err, prescriptions) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	var data = err || !prescriptions ? err || [] : prescriptions.toJSON();
+	else {
+	    var data = !prescriptions ? [] : prescriptions.toJSON();
 
-	if (ids.length) {
-	    utils.orderArray(ids, data);
+	    if (ids.length) {
+		utils.orderArray(ids, data);
+	    }
 	}
 
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: data
+	    data: err ? err : data
 	});
     });
 };

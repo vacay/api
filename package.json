@@ -28,7 +28,9 @@
 	"on-headers": "1.0.0",
 	"node-statsd": "0.0.7",
 	"kue": "0.8.5",
-	"redis": "0.10.1"
+	"redis": "0.10.1",
+	"grunt": "0.4.x",
+	"grunt-contrib-jshint": "0.7.2"
     },
     "engines": {
 	"node": "0.10.x",

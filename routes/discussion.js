@@ -56,7 +56,7 @@ var browse = function(req, res) {
 	    if (err) log.error(err, res.locals.logRequest(req));
 	    res.send(err ? 500 : 200, {
 		session: req.user,
-		data: discussions.toJSON()
+		data: err ? err : discussions.toJSON()
 	    });
 	});
 };
@@ -128,7 +128,7 @@ var create = function(req, res) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: discussion.toJSON()
+	    data: err ? err : discussion.toJSON()
 	});
     });
 };
@@ -142,13 +142,16 @@ var createComment = function(req, res) {
 	parent_id: req.param('parent_id') || null
     }).exec(function(err, comment) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	comment.set({
-	    votes: [],
-	    comments: []
-	});
+	else {
+	    comment.set({
+		votes: [],
+		comments: []
+	    });
+	}
+
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: comment.toJSON()
+	    data: err ? err : comment.toJSON()
 	});
     });
 
@@ -238,7 +241,7 @@ var destroyDiscussionVote = function(req, res) {
 	    session: req.user,
 	    data: err ? err : vote.toJSON()
 	});
-    });	
+    });
 };
 
 var createCommentVote = function(req, res) {

@@ -74,7 +74,7 @@ app.configure(function () {
     }
 
     app.use(function(req, res, next) {
-	var start = process.hrtime();;
+	var start = process.hrtime();
 
 	onHeaders(res, function() {
 	    var diff = process.hrtime(start);
@@ -113,7 +113,7 @@ var startCluster = function (onWorker, onExit) {
 };
 
 var restartApp = function(worker, code, signal) {
-    log.info('worker %d died, code (%s). restarting worker...', worker.process.pid, code);
+    log.info('worker %d died, code (%s), signal(%s). restarting worker...', worker.process.pid, code, signal);
     cluster.fork();
 };
 

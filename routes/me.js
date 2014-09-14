@@ -79,11 +79,10 @@ var upload = function(req, res) {
     var p = policy(),
 	s = signature(p),
 	ext = req.param('ext'),
-	type = req.param('type'),
 	filename = req.user.id + '_' + uuid.v4() + '.' + ext,
 	key = config.s3.folder + '/tmp/' + filename;
     
-    res.send(200, { 
+    res.send(200, {
 	session: req.user,
 	data: {
 	    policy: p,
@@ -176,7 +175,7 @@ var tags = function(req, res) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err || (!data ? [] : data.toJSON())
+	    data: err ? err : data.toJSON()
 	});
     });
 };

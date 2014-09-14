@@ -203,15 +203,17 @@ var browse = function(req, res) {
 
     ], function(err, users) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	var data = err || !users ? err || [] : users.toJSON();
+	else {
+	    var data = !users ? [] : users.toJSON();
 
-	if (ids.length) {
-	    utils.orderArray(ids, data);
+	    if (ids.length) {
+		utils.orderArray(ids, data);
+	    }
 	}
 
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: data
+	    data: err ? err : data
 	});
     });
 };

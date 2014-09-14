@@ -154,15 +154,17 @@ var browse = function(req, res) {
 
     ], function(err, vitamins) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	var data = err || !vitamins ? [] : vitamins.toJSON();
+	else {
+	    var data = !vitamins ? err : vitamins.toJSON();
 
-	if (ids.length) {
-	    utils.orderArray(ids, data);
+	    if (ids.length) {
+		utils.orderArray(ids, data);
+	    }
 	}
 
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: data
+	    data: err ? err : data
 	});
     });
 };
@@ -178,7 +180,7 @@ var sync = function(req, res) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err || !vitamins ? err || [] : vitamins.toJSON()
+	    data: err ? err : vitamins.toJSON()
 	});
     });
 };

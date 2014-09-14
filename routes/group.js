@@ -3,6 +3,7 @@
 var config = require('config-api'),
     async = require('async'),
     log = require('log')(config.log),
+    utils = require('../lib/utils'),
     db = require('db')(config);
 
 var load = function(req, res, next) {
@@ -41,15 +42,15 @@ var create = function(req, res) {
 		user_id: req.user.id,
 		created_at: new Date(),
 		access: 'admin'
-	    }).exec(function(err, relation) {
-		callback(err, group, relation);
+	    }).exec(function(err) {
+		callback(err, group);
 	    });
 	}
-    ], function(err, group, relation) {
+    ], function(err, group) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err || (!group ? [] : group.toJSON())
+	    data: err ? err : group.toJSON()
 	});
     });
 };
@@ -77,7 +78,7 @@ var read = function(req, res) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err || (!group ? [] : group.toJSON())
+	    data: err ? err : group.toJSON()
 	});
     });
 };
@@ -132,15 +133,17 @@ var browse = function(req, res) {
 
     ], function(err, groups) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	var data = err || (!groups ? [] : groups.toJSON());
+	else {
+	    var data = !groups ? [] : groups.toJSON();
 
-	if (ids.length) {
-	    utils.orderArray(ids, data);
+	    if (ids.length) {
+		utils.orderArray(ids, data);
+	    }
 	}
 
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: data
+	    data: err ? err : data
 	});
     });
 

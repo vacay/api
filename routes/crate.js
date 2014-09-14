@@ -23,7 +23,7 @@ var browse = function(req, res) {
 
 	if (query) {
 	    qb.where(function() {
-		var terms = query.split(" ");
+		var terms = query.split(' ');
 		for (var i=0; i<terms.length; i++) {
 		    if (i === 0) {
 			this.where('vitamins.title', 'LIKE', '%' + terms[i] + '%');
@@ -52,7 +52,7 @@ var browse = function(req, res) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: (err || !vitamins) ? [] : vitamins.toJSON()
+	    data: err ? err : vitamins.toJSON()
 	});
     });
 };
@@ -96,7 +96,7 @@ var findOrCreate = function(req, res, next) {
 
 	} else {
 	    next();
-	};
+	}
     });
 };
 
@@ -111,7 +111,7 @@ var create = function(req, res) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: (err || !data) ? [] : data.toJSON()
+	    data: err ? err : data.toJSON()
 	});
     });
 };
@@ -123,7 +123,7 @@ var destroy = function(req, res) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: (err || !data) ? [] : data.toJSON()
+	    data: err ? err : data.toJSON()
 	});
     });
 };

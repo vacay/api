@@ -15,7 +15,7 @@ var create = function(req, res) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err || (!data ? [] : data.toJSON())
+	    data: err ? err : data.toJSON()
 	});
     });
 };
@@ -31,7 +31,7 @@ var destroy = function(req, res) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.send(err ? 500 : 200, {
 	    session: req.user,
-	    data: err || !data ? [] : data.toJSON()
+	    data: err ? err : data.toJSON()
 	});
     });
 };

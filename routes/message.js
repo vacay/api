@@ -1,4 +1,4 @@
-/* global module, require */
+/* global module */
 
 var create = function(req, res) {
     var emails = ['kr@vacay.io'];
