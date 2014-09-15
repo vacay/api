@@ -364,7 +364,9 @@ var browse = function(req, res) {
 		    if (ids.length) {
 			qb.whereIn('id', ids);
 		    } else {
-			qb.whereNotNull('published_at')
+			qb.leftOuterJoin('prescriptions_users', 'prescriptions.id', 'prescriptions_users.prescription_id')
+			    .whereNull('prescriptions_users.user_id')
+			    .whereNotNull('prescriptions.published_at')
 			    .limit(20)
 			    .offset(offset)
 			    .orderBy('published_at', 'desc');
