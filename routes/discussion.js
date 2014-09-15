@@ -44,6 +44,7 @@ var browse = function(req, res) {
 	.query(function(qb) {
 	    qb.count('comments.id as total_comments')
 		.leftJoin('comments', 'discussions.id', 'comments.discussion_id')
+		.where('discussions.closed', 0)
 		.groupBy('discussions.id')
 		.limit(20).offset(offset).orderBy('updated_at', 'desc');
 	})
