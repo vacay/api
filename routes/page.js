@@ -34,11 +34,18 @@ var create = function(req, res, next) {
     var url = uri.subdomain() === '' ? uri.subdomain('www').toString() : uri.toString();
     db.model('Page').findOrCreate(url, function(err, page) {
 	if (err) {
-	    if (err !== 'page has no body') log.error(err, res.locals.logRequest(req));
+
+	    if (err !== 'page has no body') {
+		var errData = res.locals.logRequest(req);
+		errData.page = page;
+		log.error(err, errData);
+	    }
+
 	    res.send(500, {
 		session: req.user,
 		data: err
 	    });
+
 	} else {
 	    res.locals.page = page;
 	    next();
