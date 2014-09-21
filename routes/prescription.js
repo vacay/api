@@ -357,7 +357,9 @@ var browse = function(req, res) {
 		    return;
 		}
 	    }
+
 	    if (ids && !Array.isArray(ids)) ids = [ids];
+
 	    db.model('Prescription')
 		.collection()
 		.query(function(qb) {
