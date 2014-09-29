@@ -12,7 +12,7 @@ var load = function(req, res, next) {
     }).exec(function(err, prescription) {
 	if (err || !prescription) {
 	    if (err) log.error(err, res.locals.logRequest(req));
-	    res.send(err ? 500 : 404, {
+	    res.status(err ? 500 : 404).send({
 		session: req.user,
 		data: err ? err : 'invalid page id: ' + req.param('prescription')
 	    });
@@ -48,7 +48,7 @@ var read = function(req, res) {
 	]
     }).exec(function(err, prescription) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user || null,
 	    data: err ? err : prescription.toJSON()
 	});
@@ -147,7 +147,7 @@ var create = function(req, res) {
 
     ], function(err, prescription) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : prescription.toJSON()
 	});
@@ -300,7 +300,7 @@ var update = function(req, res) {
 
     ], function(err, prescription) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : prescription.toJSON()
 	});
@@ -322,7 +322,7 @@ var destroy = function(req, res) {
 		});
 	    }
 
-	    res.send(err ? 500 : 200, {
+	    res.status(err ? 500 : 200).send({
 		session: req.user,
 		data: err ? err : prescription.toJSON()
 	    });
@@ -406,16 +406,19 @@ var browse = function(req, res) {
 	}
 
     ], function(err, prescriptions) {
+
+	var data = [];
+
 	if (err) log.error(err, res.locals.logRequest(req));
 	else {
-	    var data = !prescriptions ? [] : prescriptions.toJSON();
+	    data = !prescriptions ? [] : prescriptions.toJSON();
 
 	    if (ids.length) {
 		utils.orderArray(ids, data);
 	    }
 	}
 
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data
 	});

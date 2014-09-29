@@ -12,12 +12,12 @@ var load = function(req, res, next) {
     }).exec(function(err, user) {
 	if (err) {
 	    log.error(err, res.locals.logRequest(req));
-	    res.send(500, {
+	    res.status(500).send({
 		session: req.user,
 		data: err
 	    });
 	} else if (!user) {
-	    res.send(404, {
+	    res.status(404).send({
 		session: req.user,
 		data: 'invalid username: ' + req.param('user')
 	    });
@@ -59,7 +59,7 @@ var read = function(req, res) {
     }).exec(function(err, user) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	if (!user) log.error('no user', res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : user.toJSON()
 	});
@@ -92,7 +92,7 @@ var update = function(req, res) {
 	    data = user.toJSON();
 	    data.email = user.attributes.email;
 	}
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? errorMessage : data
 	});
@@ -112,7 +112,7 @@ var subscribers = function(req, res) {
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : user.toJSON()
 	});
@@ -154,7 +154,7 @@ var prescriptions = function(req, res) {
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : user.toJSON()
 	});
@@ -210,16 +210,19 @@ var browse = function(req, res) {
 	}
 
     ], function(err, users) {
+
+	var data = [];
+
 	if (err) log.error(err, res.locals.logRequest(req));
 	else {
-	    var data = !users ? [] : users.toJSON();
+	    data = !users ? [] : users.toJSON();
 
 	    if (ids.length) {
 		utils.orderArray(ids, data);
 	    }
 	}
 
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data
 	});

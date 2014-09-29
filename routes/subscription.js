@@ -16,7 +16,7 @@ var create = function(req, res) {
 	updated_at: new Date()
     }).exec(function(err, subscription) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : subscription
 	});
@@ -33,7 +33,7 @@ var destroy = function(req, res) {
 	subscriber_id: req.user.id
     }).del().exec(function(err, numRows) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : numRows
 	});

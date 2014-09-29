@@ -13,7 +13,7 @@ var create = function(req, res) {
 	value: tag
     }).exec(function(err, data) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data.toJSON()
 	});
@@ -29,7 +29,7 @@ var destroy = function(req, res) {
 	value: tag
     }).del().exec(function(err, data) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data.toJSON()
 	});

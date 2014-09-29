@@ -56,7 +56,7 @@ var browse = function(req, res) {
 	    ]
 	}).exec(function(err, discussions) {
 	    if (err) log.error(err, res.locals.logRequest(req));
-	    res.send(err ? 500 : 200, {
+	    res.status(err ? 500 : 200).send({
 		session: req.user,
 		data: err ? err : discussions.toJSON()
 	    });
@@ -69,7 +69,7 @@ var load = function(req, res, next) {
     }).exec(function(err, discussion) {
 	if (err || !discussion) {
 	    if (err) log.error(err, res.locals.logRequest(req));
-	    res.send(err ? 500 : 404, {
+	    res.status(err ? 500 : 404).send({
 		session: req.user,
 		data: err ? err : 'invalid discussion id: ' + req.param('discussion')
 	    });
@@ -98,7 +98,7 @@ var read = function(req, res) {
 	    data.comments = nestComments(data.comments);
 	}
 
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data
 	});
@@ -112,7 +112,7 @@ var update = function(req, res) {
 	description: req.param('description')
     }).exec(function(err, discussion) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : discussion.toJSON()
 	});
@@ -128,7 +128,7 @@ var create = function(req, res) {
 	description: req.param('description')
     }).exec(function(err, discussion) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : discussion.toJSON()
 	});
@@ -151,7 +151,7 @@ var createComment = function(req, res) {
 	    });
 	}
 
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : comment.toJSON()
 	});
@@ -165,7 +165,7 @@ var loadComment = function(req, res, next) {
     }).exec(function(err, comment) {
 	if (err || !comment) {
 	    if (err) log.error(err, res.locals.logRequest(req));
-	    res.send(err ? 500 : 404, {
+	    res.status(err ? 500 : 404).send({
 		session: req.user,
 		data: err ? err : 'invalid discussion id: ' + req.param('comment')
 	    });
@@ -182,7 +182,7 @@ var updateComment = function(req, res) {
 	body: req.param('body')
     }).exec(function(err, comment) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : comment.toJSON()
 	});
@@ -210,7 +210,7 @@ var createDiscussionVote = function(req, res) {
 	voteable_type: 'discussions'
     }).exec(function(err, vote) {
 	if (vote && vote.attributes.vote === req.param('vote')) {
-	    res.send(200, {
+	    res.status(200).send({
 		session: req.user,
 		data: vote.toJSON()
 	    });
@@ -238,7 +238,7 @@ var createDiscussionVote = function(req, res) {
 	    patch: true
 	}).exec(function(err, vote) {
 	    if (err) log.error(err, res.locals.logRequest(req));
-	    res.send(err ? 500 : 200, {
+	    res.status(err ? 500 : 200).send({
 		session: req.user,
 		data: err ? err : vote.toJSON()
 	    });
@@ -253,7 +253,7 @@ var destroyDiscussionVote = function(req, res) {
 	voteable_type: 'discussions'
     }).destroy().exec(function(err, vote) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : vote.toJSON()
 	});
@@ -267,7 +267,7 @@ var createCommentVote = function(req, res) {
 	voteable_type: 'comments'
     }).save({vote: req.param('vote')}, {patch: true}).exec(function(err, vote) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : vote.toJSON()
 	});
@@ -281,7 +281,7 @@ var destroyCommentVote = function(req, res) {
 	voteable_type: 'comments'
     }).destroy().exec(function(err, vote) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : vote.toJSON()
 	});

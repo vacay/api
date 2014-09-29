@@ -12,12 +12,12 @@ var load = function(req, res, next) {
     }).exec(function(err, page) {
 	if (err) {
 	    log.error(err, res.locals.logRequest(req));
-	    res.send(500, {
+	    res.status(500).send({
 		session: req.user,
 		data: err
 	    });
 	} else if (!page) {
-	    res.send(404, {
+	    res.status(404).send({
 		session: req.user,
 		data: 'invalid page id: ' + req.param('page')
 	    });
@@ -41,7 +41,7 @@ var create = function(req, res, next) {
 		log.error(err, errData);
 	    }
 
-	    res.send(500, {
+	    res.status(500).send({
 		session: req.user,
 		data: err
 	    });
@@ -82,7 +82,7 @@ var read = function(req, res) {
 	    data.crates = data.craters; //deprecated - update chrome ext
 	}
 
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data
 	});
@@ -91,7 +91,7 @@ var read = function(req, res) {
 
 var track = function(req, res) {
     res.locals.page.related('users').attach(req.user.id).exec(function(err, relation) {
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : relation.toJSON()
 	});
@@ -100,7 +100,7 @@ var track = function(req, res) {
 
 var untrack = function(req, res) {
     res.locals.page.related('users').detach(req.user.id).exec(function(err, relation) {
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : relation.toJSON()
 	});

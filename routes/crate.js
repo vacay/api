@@ -50,7 +50,7 @@ var browse = function(req, res) {
 	]
     }).exec(function(err, vitamins) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : vitamins.toJSON()
 	});
@@ -67,7 +67,7 @@ var findOrCreate = function(req, res, next) {
 	if (err) {
 
 	    log.error(err, res.locals.logRequest(req));
-	    res.send(500, {
+	    res.status(500).send({
 		session: req.user,
 		data: err
 	    });
@@ -83,7 +83,7 @@ var findOrCreate = function(req, res, next) {
 
 		if (err) {
 		    log.error(err, res.locals.logRequest(req));
-		    res.send(500, {
+		    res.status(500).send({
 			session: req.user,
 			data: err
 		    });
@@ -109,7 +109,7 @@ var create = function(req, res) {
 	created_at: new Date()
     }).exec(function(err, data) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data.toJSON()
 	});
@@ -121,7 +121,7 @@ var destroy = function(req, res) {
 	id: req.user.id
     }).crate().detach(res.locals.vitamin.id).exec(function(err, data) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data.toJSON()
 	});

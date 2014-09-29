@@ -32,7 +32,7 @@ var authenticate = function(req, res, next) {
 
 var isAuthenticated = function(req, res, next) {
     if (!req.user) {
-	res.send(401, {
+	res.status(401).send({
 	    data: 'no session',
 	    session: null
 	});
@@ -53,7 +53,7 @@ var hasParams = function(params) {
 	});
 	
 	if (!exists) {
-	    res.send(400, {
+	    res.status(400).send({
 		message: 'missing param: ' + missing,
 		session: req.user
 	    });
@@ -114,7 +114,7 @@ module.exports = function (app) {
 	     discussion.load,
 	     discussion.createDiscussionVote);
 
-    app.del('/v1/discussion/:discussion/vote',
+    app.delete('/v1/discussion/:discussion/vote',
 	    isAuthenticated,
 	    discussion.load,
 	    discussion.destroyDiscussionVote);
@@ -142,7 +142,7 @@ module.exports = function (app) {
 	     discussion.loadComment,
 	     discussion.createCommentVote);
 
-    app.del('/v1/discussion/:discussion/comment/:comment/vote',
+    app.delete('/v1/discussion/:discussion/comment/:comment/vote',
 	    isAuthenticated,
 	    discussion.loadComment,
 	    discussion.destroyCommentVote);
@@ -168,7 +168,7 @@ module.exports = function (app) {
 	     group.load,
 	     subscription.create);
 
-    app.del('/v1/group/:group/subscription',
+    app.delete('/v1/group/:group/subscription',
 	    isAuthenticated,
 	    group.load,
 	    subscription.destroy);
@@ -236,7 +236,7 @@ module.exports = function (app) {
 	     page.load,
 	     page.track);
 
-    app.del('/v1/page/:page/track',
+    app.delete('/v1/page/:page/track',
 	    isAuthenticated,
 	    page.load,
 	    page.untrack);
@@ -259,7 +259,7 @@ module.exports = function (app) {
 	    isAuthenticated,
 	    prescription.update);
 
-    app.del('/v1/prescription/:prescription',
+    app.delete('/v1/prescription/:prescription',
 	    isAuthenticated,
 	    prescription.destroy);
 
@@ -282,7 +282,7 @@ module.exports = function (app) {
 	     user.load,
 	     subscription.create);
 
-    app.del('/v1/user/:user/subscription',
+    app.delete('/v1/user/:user/subscription',
 	    isAuthenticated,
 	    user.load,
 	    subscription.destroy);
@@ -327,12 +327,12 @@ module.exports = function (app) {
 	     crate.findOrCreate,
 	     tag.create);
 
-    app.del('/v1/vitamin/:vitamin/crate',
+    app.delete('/v1/vitamin/:vitamin/crate',
 	    isAuthenticated,
 	    vitamin.load,
 	    crate.destroy);
 
-    app.del('/v1/vitamin/:vitamin/tag',
+    app.delete('/v1/vitamin/:vitamin/tag',
 	    isAuthenticated,
 	    vitamin.load,
 	    tag.destroy);
@@ -347,11 +347,11 @@ module.exports = function (app) {
 	var error = req.param('error');
 	error.user = req.user;
 	log.error(error.errorMessage, error);
-	res.send(200);
+	res.sendStatus(200);
     });
 
     app.get('*', function (req, res) {
-	res.send(404, {
+	res.status(404).send({
 	    message: 'invalid endpoint: ' + req.url,
 	    session: req.user
 	});

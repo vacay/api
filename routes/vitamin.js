@@ -12,12 +12,12 @@ var load = function(req, res, next) {
     }).exec(function(err, vitamin) {
 	if (err) {
 	    log.error(err, res.locals.logRequest(req));
-	    res.send(500, {
+	    res.status(500).send({
 		session: req.user,
 		data: err
 	    });
 	} else if (!vitamin) {
-	    res.send(404, {
+	    res.status(404).send({
 		session: req.user,
 		data: err
 	    });
@@ -38,7 +38,7 @@ var create = function(req, res) {
 	stream_url: req.param('stream_url')
     }, function(err, vitamin) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : vitamin.toJSON()
 	});
@@ -70,7 +70,7 @@ var read = function(req, res) {
     }, function(err, results) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	results.vitamin.set({prescribers: results.prescribers});
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : results.vitamin.toJSON()
 	});
@@ -83,7 +83,7 @@ var update = function(req, res) {
 	title: req.param('title')
     }).exec(function(err, vitamin) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : vitamin.toJSON()
 	});
@@ -154,16 +154,19 @@ var browse = function(req, res) {
 	}
 
     ], function(err, vitamins) {
+
+	var data = [];
+
 	if (err) log.error(err, res.locals.logRequest(req));
 	else {
-	    var data = !vitamins ? [] : vitamins.toJSON();
+	    data = !vitamins ? [] : vitamins.toJSON();
 
 	    if (ids.length) {
 		utils.orderArray(ids, data);
 	    }
 	}
 
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200, {
 	    session: req.user,
 	    data: err ? err : data
 	});
@@ -179,7 +182,7 @@ var sync = function(req, res) {
 	if (last_synced_at) qb.andWhere('updated_at', '>', last_synced_at);
     }).fetch({ withRelated: ['hosts'] }).exec(function(err, vitamins) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : vitamins.toJSON()
 	});

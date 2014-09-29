@@ -11,14 +11,14 @@ module.exports.signin = function (req, res, next) {
 	email: email
     }).then(function (user) {
 	if (!user) {
-	    res.send(400, {
+	    res.status(400).send({
 		session: null,
 		data: 'Invalid email'
 	    });
 	} else {
 	    user.checkPassword(password, function (valid) {
 		if (!valid) {
-		    res.send(400, {
+		    res.status(400).send({
 			session: null,
 			data: 'Invalid password'
 		    });
@@ -42,13 +42,13 @@ module.exports.signup = function (req, res, next) {
 	username: req.param('username')
     }, function (err, user) {
 	if (err === 'Email exists' || err === 'Username exists') {
-	    res.send(400, {
+	    res.status(400).send({
 		session: null,
 		data: err
 	    });
 	} else if (err) {
 	    log.error(err, res.locals.logRequest(req));
-	    res.send(500, {
+	    res.status(500).send({
 		session: null,
 		data: 'Could not add user'
 	    });
@@ -67,7 +67,7 @@ module.exports.reset = function(req, res, next) {
     jwt.verify(resetToken, config.reset.secret, function(err, decoded) {
 	if (err) log.error(err.toString());
 	if (decoded.email !== email) {
-	    res.send(400, {
+	    res.status(400).send({
 		session: null,
 		data: 'Invalid email'
 	    });
@@ -79,7 +79,7 @@ module.exports.reset = function(req, res, next) {
 	}).then(function (user) {
 	    if (err) {
 		log.error(err, res.locals.logRequest(req));
-		res.send(400, {
+		res.status(400).send({
 		    session: null,
 		    data: 'Please request a new reset password link'
 		});
@@ -87,7 +87,7 @@ module.exports.reset = function(req, res, next) {
 		user.resetPassword(req.param('password'), function(err) {
 		    if (err) {
 			log.error(err, res.locals.logRequest(req));
-			res.send(500, {
+			res.status(500).send({
 			    session: null,
 			    data: 'Unable to reset password'
 			});
@@ -109,7 +109,7 @@ module.exports.requestReset = function(req, res) {
 	email: req.param('email')
     }).then(function (user) {
 	if (!user) {
-	    res.send(400, {
+	    res.status(400).send({
 		session: null,
 		data: 'Invalid email'
 	    });
@@ -135,7 +135,7 @@ module.exports.requestReset = function(req, res) {
 		link: link
 	    }).removeOnComplete(true).save();
 
-	    res.send(200, {
+	    res.status(200).send({
 		session: null,
 		data: 'sent'
 	    });

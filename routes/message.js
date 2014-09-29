@@ -14,7 +14,7 @@ var create = function(req, res) {
 	html: html
     }).removeOnComplete(true).save();
 
-    res.send(200, {
+    res.status(200).send({
 	session: req.user,
 	data: 'sent'
     });

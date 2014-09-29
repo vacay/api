@@ -17,7 +17,7 @@ var index = function (req, res) {
     }).exec(function (err, user) {
 	if (err) {
 	    log.error(err, res.locals.logRequest(req));
-	    res.send(500, {
+	    res.status(500).send({
 		session: req.user,
 		data: err
 	    });
@@ -36,7 +36,7 @@ var index = function (req, res) {
 
 	    data.subscriptions = data.users; //to be deprecated
 
-	    res.send(200, {
+	    res.status(200).send({
 		session: req.user,
 		data: data,
 		token: token
@@ -49,7 +49,7 @@ var inbox = function(req, res) {
 
     var response = function(err, prescriptions) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : prescriptions.toJSON()
 	});
@@ -151,7 +151,7 @@ var upload = function(req, res) {
 	filename = req.user.id + '_' + uuid.v4() + '.' + ext,
 	key = config.s3.folder + '/tmp/' + filename;
     
-    res.send(200, {
+    res.status(200).send({
 	session: req.user,
 	data: {
 	    policy: p,
@@ -188,7 +188,7 @@ var drafts = function(req, res) {
 	    ]
 	}).exec(function(err, prescriptions) {
 	    if (err) log.error(err, res.locals.logRequest(req));
-	    res.send(err ? 500 : 200, {
+	    res.status(err ? 500 : 200).send({
 		session: req.user,
 		data: err ? err : prescriptions.toJSON()
 	    });
@@ -198,7 +198,7 @@ var drafts = function(req, res) {
 var pages = function(req, res) {
     db.model('User').forge({id: req.user.id}).related('pages').fetch().exec(function(err, pages) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : pages.toJSON()
 	});
@@ -232,7 +232,7 @@ var tracker = function(req, res) {
 	]
     }).exec(function(err, vitamins) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : vitamins.toJSON()
 	});
@@ -242,7 +242,7 @@ var tracker = function(req, res) {
 var tags = function(req, res) {
     db.model('User').forge({id: req.user.id}).related('tags').fetch().exec(function(err, data) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data.toJSON()
 	});

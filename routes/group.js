@@ -12,12 +12,12 @@ var load = function(req, res, next) {
     }).exec(function(err, group) {
 	if (err) {
 	    log.error(err, res.locals.logRequest(req));
-	    res.send(500, {
+	    res.status(500).send({
 		session: req.user,
 		data: err
 	    });
 	} else if (!group) {
-	    res.send(404, {
+	    res.status(404).send({
 		session: req.user,
 		data: 'invalid group id: ' + req.param('group')
 	    });
@@ -48,7 +48,7 @@ var create = function(req, res) {
 	}
     ], function(err, group) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : group.toJSON()
 	});
@@ -113,7 +113,7 @@ var read = function(req, res) {
 	]
     }).exec(function(err, group) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : group.toJSON()
 	});
@@ -173,16 +173,19 @@ var browse = function(req, res) {
 	}
 
     ], function(err, groups) {
+
+	var data = [];
+
 	if (err) log.error(err, res.locals.logRequest(req));
 	else {
-	    var data = !groups ? [] : groups.toJSON();
+	    data = !groups ? [] : groups.toJSON();
 
 	    if (ids.length) {
 		utils.orderArray(ids, data);
 	    }
 	}
 
-	res.send(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data
 	});
