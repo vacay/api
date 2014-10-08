@@ -131,6 +131,11 @@ module.exports = function (app) {
 	    discussion.loadComment,
 	    discussion.updateComment);
 
+    app.del('/v1/discussion/:discussion/comment/:comment',
+	    isAuthenticated,
+	    discussion.loadComment,
+	    discussion.destroyComment);
+
     app.post('/v1/discussion/:discussion/comment/:comment/vote',
 	     isAuthenticated,
 	     hasParams(['vote']),

@@ -189,6 +189,20 @@ var updateComment = function(req, res) {
     });
 };
 
+var destroyComment = function(req, res) {
+    db.model('Comment').edit({
+	id: req.param('comment'),
+	body: 'deleted',
+	user_id: 0
+    }).exec(function(err, comment) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.send(err ? 500 : 200, {
+	    session: req.user,
+	    data: err ? err : comment.toJSON()
+	});
+    });
+};
+
 var createDiscussionVote = function(req, res) {
     db.model('Vote').findOne({
 	user_id: req.user.id,
@@ -285,6 +299,7 @@ module.exports = {
     loadComment: loadComment,
     createComment: createComment,
     updateComment: updateComment,
+    destroyComment: destroyComment,
     createCommentVote: createCommentVote,
     destroyCommentVote: destroyCommentVote
 };
