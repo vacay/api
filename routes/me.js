@@ -114,7 +114,11 @@ var inbox = function(req, res) {
 		    }
 		},
 		'users',
-		'groups'
+		'groups',
+		'children',
+		'children.prescriber',
+		'parent',
+		'parent.prescriber'
 	    ]
 	}).exec(response);
     });

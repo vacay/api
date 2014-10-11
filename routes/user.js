@@ -50,7 +50,11 @@ var read = function(req, res) {
 		}
 	    },
 	    'prescriptions.users',
-	    'prescriptions.groups'
+	    'prescriptions.groups',
+	    'prescriptions.parent',
+	    'prescriptions.parent.prescriber',
+	    'prescriptions.children',
+	    'prescriptions.children.prescriber'
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err, res.locals.logRequest(req));
@@ -142,7 +146,11 @@ var prescriptions = function(req, res) {
 		}
 	    },
 	    'users',
-	    'groups'
+	    'groups',
+	    'parent',
+	    'parent.prescriber',
+	    'children',
+	    'children.prescriber'
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err, res.locals.logRequest(req));

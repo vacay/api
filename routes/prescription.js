@@ -40,7 +40,11 @@ var read = function(req, res) {
 		}
 	    },
 	    'users',
-	    'groups'
+	    'groups',
+	    'children',
+	    'children.prescriber',
+	    'parent',
+	    'parent.prescriber'
 	]
     }).exec(function(err, prescription) {
 	if (err) log.error(err, res.locals.logRequest(req));
@@ -58,6 +62,7 @@ var create = function(req, res) {
     if (typeof req.param('image') !== 'undefined') params.image_url = req.param('image');
     if (typeof req.param('description') !== 'undefined') params.description = req.param('description');
     if (typeof req.param('published_at') !== 'undefined') params.published_at = new Date();
+    if (typeof req.param('parent_id') !== 'undefined') params.parent_id = req.param('parent_id');
 
     params.prescriber_id = req.user.id;
 
@@ -369,6 +374,7 @@ var browse = function(req, res) {
 			qb.leftOuterJoin('prescriptions_users', 'prescriptions.id', 'prescriptions_users.prescription_id')
 			    .whereNull('prescriptions_users.user_id')
 			    .whereNotNull('prescriptions.published_at')
+			    .whereNull('prescriptions.parent_id')
 			    .limit(20)
 			    .offset(offset)
 			    .orderBy('published_at', 'desc');
@@ -390,7 +396,11 @@ var browse = function(req, res) {
 			    }
 			},
 			'users',
-			'groups'
+			'groups',
+			'children',
+			'children.prescriber',
+			'parent',
+			'parent.prescriber'
 		    ]
 		}).exec(callback);
 	}
