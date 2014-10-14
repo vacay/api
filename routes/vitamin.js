@@ -155,7 +155,7 @@ var browse = function(req, res) {
     ], function(err, vitamins) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	else {
-	    var data = !vitamins ? err : vitamins.toJSON();
+	    var data = !vitamins ? [] : vitamins.toJSON();
 
 	    if (ids.length) {
 		utils.orderArray(ids, data);
