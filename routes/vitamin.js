@@ -103,7 +103,8 @@ var browse = function(req, res) {
 		    index: 'vcy',
 		    type: 'vitamins',
 		    q: query,
-		    size: 10
+		    size: 10,
+		    from: offset
 		}, callback);
 	    } else {
 		callback(null, null, null);
