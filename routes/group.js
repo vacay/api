@@ -55,6 +55,36 @@ var create = function(req, res) {
     });
 };
 
+var update = function(req, res) {
+    db.knex('groups_users').select().where({
+	user_id: req.user.id,
+	group_id: res.locals.group.id
+    }).exec(function(err, users) {
+	if (err) log.error(err, res.locals.logRequest(req));
+
+	if (users && users.length) {
+
+	    db.model('Group').edit({
+		id: res.locals.group.id,
+		name: req.param('name'),
+		description: req.param('description')
+	    }).exec(function(err, group) {
+		if (err) log.error(err, res.locals.logRequest(req));
+		res.send(err ? 500 : 200, {
+		    session: req.user,
+		    data: err ? err : group.toJSON()
+		});
+	    });
+
+	} else {
+	    res.send(403, {
+		message: 'not authorized to modify group: ' + res.locals.group.id,
+		session: req.user
+	    });
+	}
+    });
+};
+
 var read = function(req, res) {
     res.locals.group.fetch({
 	withRelated: [
@@ -72,7 +102,14 @@ var read = function(req, res) {
 		'prescriptions.vitamins.tags': function(qb) {
 		    qb.where('tags.user_id', req.user.id);
 		}
-	    }
+	    },
+	    'prescriptions.users',
+	    'prescriptions.groups',
+	    'prescriptions.parent',
+	    'prescriptions.parent.prescriber',
+	    'prescriptions.children',
+	    'prescriptions.children.prescriber'
+
 	]
     }).exec(function(err, group) {
 	if (err) log.error(err, res.locals.logRequest(req));
@@ -128,7 +165,11 @@ var browse = function(req, res) {
 			    .offset(offset)
 			    .orderBy('created_at', 'desc');
 		    }
-		}).fetch().exec(callback);
+		}).fetch({
+		    withRelated: [
+			'admins'
+		    ]
+		}).exec(callback);
 	}
 
     ], function(err, groups) {
@@ -153,6 +194,7 @@ var browse = function(req, res) {
 module.exports = {
     load: load,
     create: create,
+    update: update,
     read: read,
     browse: browse
 };

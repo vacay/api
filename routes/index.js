@@ -157,6 +157,12 @@ module.exports = function (app) {
 	    group.load,
 	    group.read);
 
+    app.put('/v1/group/:group',
+	    isAuthenticated,
+	    hasParams(['name', 'description']),
+	    group.load,
+	    group.update);
+
     app.post('/v1/group/:group/subscription',
 	     isAuthenticated,
 	     group.load,
