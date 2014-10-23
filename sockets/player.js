@@ -52,48 +52,50 @@ module.exports = function(io, socket) {
 
 	socket.emit(count === 1 ? 'master' : 'remote');
 
-	if (count > 1) {
+	client.get(user + ':queue', function(err, reply) {
+	    if (err) log.error(err);
+	    else {
+		var data = JSON.parse(reply);
+		if (data) {
+		    socket.emit('queue:update', {
+			queue: data
+		    });
+		}
+	    }
+	});
 
-	    if (master !== socket.id) {
+	client.get(user + ':nowplaying', function(err, reply) {
+	    if (err) log.error(err);
+	    else {
+		var data = JSON.parse(reply);
+		if (data) {
+		    socket.emit('player:nowplaying:update', {
+			nowplaying: data
+		    });
+		}
+	    }
+	});
 
-		client.get(user + ':queue', function(err, reply) {
-		    if (!err) {
-			var data = JSON.parse(reply);
-			if (data) {
-			    socket.emit('queue:update', {
-				queue: data
-			    });
-			}
-		    }
-		});
+	client.get(user + ':css', function(err, reply) {
+	    if (err) log.error(err);
+	    else {
+		var data = JSON.parse(reply);
+		if (data) socket.emit('player:css:update', data);
+	    }
+	});
 
-		client.get(user + ':nowplaying', function(err, reply) {
-		    if (!err) {
-			var data = JSON.parse(reply);
-			if (data) {
-			    socket.emit('player:nowplaying:update', {
-				nowplaying: data
-			    });
-			}
-		    }
-		});
-
-		client.get(user + ':css', function(err, reply) {
-		    if (!err) {
-			var data = JSON.parse(reply);
-			if (data) socket.emit('player:css:update', data);
-		    }
-		});
-
-		client.get(user + ':volume', function(err, reply) {
-		    if (!err) {
-			var data = JSON.parse(reply);
-			if (data) socket.emit('player:volume', {
-			    volume: data
-			});
-		    }
+	client.get(user + ':volume', function(err, reply) {
+	    if (err) log.error(err);
+	    else {
+		var data = JSON.parse(reply);
+		if (data) socket.emit('player:volume', {
+		    volume: data
 		});
 	    }
+	});
+
+
+	if (count > 1) {
 
 	    socket.on('player:next', function() {
 		socket.to(user).emit('player:next');
