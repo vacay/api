@@ -5,6 +5,7 @@ var config = require('config-api'),
 
 var express = require('express'),
     cluster = require('cluster'),
+    redis = require('redis'),
     os = require('os'),
     kue = require('kue'),
     elasticsearch = require('elasticsearch'),
@@ -15,7 +16,8 @@ var express = require('express'),
     compression = require('compression'),
     methodOverride = require('method-override'),
     morgan = require('morgan'),
-    socketio = require('socket.io');
+    socketio = require('socket.io'),
+    redisAdapter = require('socket.io-redis');
 
 var socket = require('./modules/socket');
 var routes = require('./routes');
@@ -95,48 +97,34 @@ app.use(function(req, res, next) {
 
 routes(app);
 
-var startCluster = function (onWorker, onExit) {
-    if (cluster.isMaster) {
+var port = config.port;
+var env = process.env.NODE_ENV ? ('[' + process.env.NODE_ENV + ']') : '[development]';
 
-	log.info('Initializing ' + os.cpus().length + ' workers in this cluster.');
+var server = app.listen(port, function () {
+    log.info(config.title + ' listening on ' + port + ' in ' + env);
+});
 
-	for (var i = 0; i < os.cpus().length; i++) {
-	    cluster.fork();
-	}
+var io = socketio(server, {
+    serveClient: false
+});
 
-	cluster.on('exit', onExit);
+var pub = redis.createClient(config.redis.port, config.redis.host, {
+    auth_pass: config.redis.auth_pass
+});
 
-    } else {
+var sub = redis.createClient(config.redis.port, config.redis.host, {
+    detect_buffers: true,
+    auth_pass: config.redis.auth_pass
+});
 
-	onWorker();
+io.adapter(redisAdapter({
+    pubClient: pub,
+    subClient: sub
+}));
 
-    }
-};
+io.use(socketioJwt.authorize({
+    secret: config.session.secret,
+    handshake: true
+}));
 
-var startApp = function () {
-    var port = config.port;
-    var env = process.env.NODE_ENV ? ('[' + process.env.NODE_ENV + ']') : '[development]';
-
-    var server = app.listen(port, function () {
-	log.info(config.title + ' listening on ' + port + ' in ' + env);
-    });
-
-    var io = socketio(server, {
-	origins: '*:*',
-	serveClient: false
-    });
-
-    io.use(socketioJwt.authorize({
-	secret: config.session.secret,
-	handshake: true
-    }));
-
-    socket(io);
-};
-
-var restartApp = function(worker, code, signal) {
-    log.info('worker %d died, code (%s), signal(%s). restarting worker...', worker.process.pid, code, signal);
-    cluster.fork();
-};
-
-startCluster(startApp, restartApp);
+socket(io);

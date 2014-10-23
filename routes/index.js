@@ -131,7 +131,7 @@ module.exports = function (app) {
 	    discussion.loadComment,
 	    discussion.updateComment);
 
-    app.del('/v1/discussion/:discussion/comment/:comment',
+    app.delete('/v1/discussion/:discussion/comment/:comment',
 	    isAuthenticated,
 	    discussion.loadComment,
 	    discussion.destroyComment);

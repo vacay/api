@@ -41,6 +41,12 @@ module.exports = {
 	charset  : 'UTF8_GENERAL_CI'
     },
 
+    redis: {
+	host: '127.0.0.1',
+	port: 6379,
+	auth_pass: null
+    },
+
     queue: {
     
 	redis: {

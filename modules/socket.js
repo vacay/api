@@ -30,7 +30,7 @@ module.exports = function(io) {
 	    log.debug('successful socket connection to', socket.decoded_token.username);
 
 	    listeners.forEach(function(listener) {
-		listener(socket);
+		listener(io, socket);
 	    });
 	});
     });
