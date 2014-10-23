@@ -5,7 +5,6 @@ var config = require('config-api'),
 
 var express = require('express'),
     cluster = require('cluster'),
-    redis = require('redis'),
     os = require('os'),
     kue = require('kue'),
     elasticsearch = require('elasticsearch'),
@@ -16,8 +15,7 @@ var express = require('express'),
     compression = require('compression'),
     methodOverride = require('method-override'),
     morgan = require('morgan'),
-    socketio = require('socket.io'),
-    redisAdapter = require('socket.io-redis');
+    socketio = require('socket.io');
 
 var socket = require('./modules/socket');
 var routes = require('./routes');
@@ -67,7 +65,7 @@ app.use(function(req, res, next) {
 
     // intercept OPTIONS method
     if ('OPTIONS' === req.method || '/health_check' === req.path) {
-	res.send(200);
+	res.sendStatus(200);
     } else {
 	next();
     }
@@ -107,20 +105,6 @@ var server = app.listen(port, function () {
 var io = socketio(server, {
     serveClient: false
 });
-
-var pub = redis.createClient(config.redis.port, config.redis.host, {
-    auth_pass: config.redis.auth_pass
-});
-
-var sub = redis.createClient(config.redis.port, config.redis.host, {
-    detect_buffers: true,
-    auth_pass: config.redis.auth_pass
-});
-
-io.adapter(redisAdapter({
-    pubClient: pub,
-    subClient: sub
-}));
 
 io.use(socketioJwt.authorize({
     secret: config.session.secret,
