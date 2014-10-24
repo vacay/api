@@ -15,7 +15,8 @@ var express = require('express'),
     compression = require('compression'),
     methodOverride = require('method-override'),
     morgan = require('morgan'),
-    socketio = require('socket.io');
+    socketio = require('socket.io'),
+    http = require('http');
 
 var socket = require('./modules/socket');
 var routes = require('./routes');
@@ -97,10 +98,7 @@ routes(app);
 
 var port = config.port;
 var env = process.env.NODE_ENV ? ('[' + process.env.NODE_ENV + ']') : '[development]';
-
-var server = app.listen(port, function () {
-    log.info(config.title + ' listening on ' + port + ' in ' + env);
-});
+var server = http.Server(app);
 
 var io = socketio(server, {
     serveClient: false
@@ -112,3 +110,7 @@ io.use(socketioJwt.authorize({
 }));
 
 socket(io);
+
+server.listen(port, function () {
+    log.info(config.title + ' listening on ' + port + ' in ' + env);
+});
