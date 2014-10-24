@@ -56,11 +56,10 @@ module.exports = function(io, socket) {
 		resetMaster();
 		master = clients[0];
 		socket.to(master).emit('master');
-		socket.broadcast.to(user).emit('remote');
 	    }
 	});
 
-	socket.emit(count === 1 ? 'master' : 'remote');
+	socket.emit(master === socket.id ? 'master' : 'remote');
 
 	client.get(user + ':queue', function(err, reply) {
 	    if (err) log.error(err);
