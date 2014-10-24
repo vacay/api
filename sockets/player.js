@@ -21,6 +21,11 @@ module.exports = function(io, socket) {
 	var count = clients.length;
 	var master = clients[0];
 
+	socket.on('set:master', function() {
+	    master = socket.id;
+	    socket.broadcast.to(user).emit('remote');
+	});
+
 	socket.on('disconnect', function() {
 	    clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
 
