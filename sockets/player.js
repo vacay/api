@@ -109,22 +109,6 @@ module.exports = function(io, socket) {
 		socket.to(user).emit('player:previous');
 	    });
 
-	    socket.on('player:volume', function(data) {
-		client.set(user + ':volume', JSON.stringify(data.volume));
-		client.expire(user + ':volume', EXPIRES);
-
-		socket.to(user).emit('player:volume', data);
-	    });
-
-	    socket.on('player:css:update', function(data) {
-		log.debug(data);
-
-		client.set(user + ':css', JSON.stringify(data));
-		client.expire(user + ':css', EXPIRES);
-
-		socket.to(user).emit('player:css:update', data);
-	    });
-
 	    socket.on('player:position:update', function(data) {
 		log.debug(data);
 
@@ -143,24 +127,43 @@ module.exports = function(io, socket) {
 		socket.to(user).emit('player:time:update', data);
 	    });
 
-	    socket.on('player:nowplaying:update', function(data) {
-		log.debug(data);
 
-		client.set(user + ':nowplaying', JSON.stringify(data.nowplaying));
-		client.expire(user + ':nowplaying', EXPIRES);
-
-		socket.broadcast.emit('vitamin:play', data.nowplaying);
-		socket.to(user).emit('player:nowplaying:update', data);
-	    });
-
-	    socket.on('queue:update', function(data) {
-		log.debug(data);
-
-		client.set(user + ':queue', JSON.stringify(data.queue));
-		client.expire(user + ':queue', EXPIRES);
-
-		socket.to(user).emit('queue:update', data);
-	    });
 	}
+
+	socket.on('player:css:update', function(data) {
+	    log.debug(data);
+
+	    client.set(user + ':css', JSON.stringify(data));
+	    client.expire(user + ':css', EXPIRES);
+
+	    socket.to(user).emit('player:css:update', data);
+	});
+
+	socket.on('queue:update', function(data) {
+	    log.debug(data);
+
+	    client.set(user + ':queue', JSON.stringify(data.queue));
+	    client.expire(user + ':queue', EXPIRES);
+
+	    socket.to(user).emit('queue:update', data);
+	});
+
+	socket.on('player:nowplaying:update', function(data) {
+	    log.debug(data);
+
+	    client.set(user + ':nowplaying', JSON.stringify(data.nowplaying));
+	    client.expire(user + ':nowplaying', EXPIRES);
+
+	    socket.broadcast.emit('vitamin:play', data.nowplaying);
+	    socket.to(user).emit('player:nowplaying:update', data);
+	});
+
+	socket.on('player:volume', function(data) {
+	    client.set(user + ':volume', JSON.stringify(data.volume));
+	    client.expire(user + ':volume', EXPIRES);
+
+	    socket.to(user).emit('player:volume', data);
+	});
+
     });
 };
