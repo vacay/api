@@ -17,42 +17,47 @@ module.exports = function(io, socket) {
     socket.join(user, function(err) {
 	if (err) log.error(err);
 
+	var resetMaster = function() {
+	    var data = {
+		css: 'paused',
+		playing: false
+	    };
+
+	    client.set(user + ':css', JSON.stringify(data));
+	    client.expire(user + ':css', EXPIRES);
+	    socket.to(user).emit('player:stop');
+	    socket.to(user).emit('player:css:update', data);
+	    socket.to(user).emit('player:loading:update', {
+		loading: {
+		    width: '0%'
+		}
+	    });
+	    socket.to(user).emit('player:position:update', {
+		position: {
+		    width: '0%'
+		}
+	    });
+	};
+
 	var clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
 	var count = clients.length;
 	var master = clients[0];
 
 	socket.on('set:master', function() {
+	    resetMaster();
 	    master = socket.id;
+	    socket.to(master).emit('master');
 	    socket.broadcast.to(user).emit('remote');
 	});
 
 	socket.on('disconnect', function() {
-	    clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
-
-	    if (master !== clients[0]) {
-		var data = {
-		    css: 'paused',
-		    playing: false
-		};
-
-		client.set(user + ':css', JSON.stringify(data));
-		client.expire(user + ':css', EXPIRES);
-
-		socket.to(user).emit('player:css:update', data);
-		socket.to(user).emit('player:loading:update', {
-		    loading: {
-			width: '0%'
-		    }
-		});
-		socket.to(user).emit('player:position:update', {
-		    position: {
-			width: '0%'
-		    }
-		});
+	    if (master === socket.id) {
+		clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
+		resetMaster();
+		master = clients[0];
+		socket.to(master).emit('master');
+		socket.broadcast.to(user).emit('remote');
 	    }
-
-	    master = clients[0];
-	    socket.to(master).emit('master');
 	});
 
 	socket.emit(count === 1 ? 'master' : 'remote');
