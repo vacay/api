@@ -24,8 +24,12 @@ var queue = kue.createQueue(config.queue);
 var stats = new StatsD(config.stats);
 var es = new elasticsearch.Client(config.elasticsearch);
 
-stats.socket.on('error', function(error) {
-    return log.error('statsd error: ', error);
+queue.on('error', function(err) {
+    log.error('kue error: ', err);
+});
+
+stats.socket.on('error', function(err) {
+    return log.error('statsd error: ', err);
 });
 
 var app = express();
