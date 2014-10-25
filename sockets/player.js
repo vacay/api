@@ -8,6 +8,10 @@ var client = redis.createClient(config.redis.port, config.redis.host, {
     auth_pass: config.redis.auth_pass
 });
 
+client.on('error', function(err) {
+    log.error('redis error: ', err);
+});
+
 var EXPIRES = 604800;
 
 module.exports = function(io, socket) {
