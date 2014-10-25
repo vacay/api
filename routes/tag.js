@@ -27,11 +27,11 @@ var destroy = function(req, res) {
 	user_id: req.user.id,
 	vitamin_id: res.locals.vitamin.id,
 	value: tag
-    }).del().exec(function(err, data) {
+    }).del().exec(function(err, numRows) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
-	    data: err ? err : data.toJSON()
+	    data: err ? err : numRows
 	});
     });
 };
