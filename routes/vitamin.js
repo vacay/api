@@ -166,7 +166,7 @@ var browse = function(req, res) {
 	    }
 	}
 
-	res.status(err ? 500 : 200, {
+	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : data
 	});
