@@ -261,17 +261,47 @@ var destroyDiscussionVote = function(req, res) {
 };
 
 var createCommentVote = function(req, res) {
-    db.model('Vote').forge({
+    db.model('Vote').findOne({
 	user_id: req.user.id,
 	voteable_id: res.locals.comment.id,
 	voteable_type: 'comments'
-    }).save({vote: req.param('vote')}, {patch: true}).exec(function(err, vote) {
-	if (err) log.error(err, res.locals.logRequest(req));
-	res.status(err ? 500 : 200).send({
-	    session: req.user,
-	    data: err ? err : vote.toJSON()
+    }).exec(function(err, vote) {
+	if (vote && vote.attributes.vote === req.param('vote')) {
+	    res.status(200).send({
+		session: req.user,
+		data: vote.toJSON()
+	    });
+	    return;
+	}
+
+	var model = db.model('Vote').forge({
+	    user_id: req.user.id,
+	    voteable_id: res.locals.comment.id,
+	    voteable_type: 'comments'
+	});
+
+	if (vote) {
+	    model.query('where', {
+		user_id: req.user.id,
+		voteable_id: res.locals.comment.id,
+		voteable_type: 'comments'
+	    });
+	}
+
+	model.save({
+	    vote: req.param('vote')
+	}, {
+	    method: vote ? 'update' : 'insert',
+	    patch: true
+	}).exec(function(err, vote) {
+	    if (err) log.error(err, res.locals.logRequest(req));
+	    res.status(err ? 500 : 200).send({
+		session: req.user,
+		data: err ? err : vote.toJSON()
+	    });
 	});
     });
+
 };
 
 var destroyCommentVote = function(req, res) {
