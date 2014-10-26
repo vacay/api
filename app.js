@@ -117,7 +117,7 @@ io.use(socketioJwt.authorize({
     handshake: true
 }));
 
-socket(io);
+socket(io, queue);
 
 server.listen(port, function () {
     log.info(config.title + ' listening on ' + port + ' in ' + env);
