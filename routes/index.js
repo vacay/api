@@ -309,7 +309,8 @@ module.exports = function (app) {
     app.post('/v1/vitamin',
 	     isAuthenticated,
 	     hasParams(['url', 'title', 'host', 'stream_url']),
-	     vitamin.create);
+	     vitamin.create,
+	     vitamin.read);
 
     app.get('/v1/vitamin/:vitamin',
 	    isAuthenticated,

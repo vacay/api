@@ -28,7 +28,7 @@ var load = function(req, res, next) {
     });
 };
 
-var create = function(req, res) {
+var create = function(req, res, next) {
     db.model('Vitamin').findOrCreate({
 	url: req.param('url'),
 	duration: req.param('duration'),
@@ -37,11 +37,16 @@ var create = function(req, res) {
 	id: req.param('id'),
 	stream_url: req.param('stream_url')
     }, function(err, vitamin) {
-	if (err) log.error(err, res.locals.logRequest(req));
-	res.status(err ? 500 : 200).send({
-	    session: req.user,
-	    data: err ? err : vitamin.toJSON()
-	});
+	if (err || !vitamin) {
+	    log.error(err, res.locals.logRequest(req));
+	    res.status(500).send({
+		session: req.user,
+		data: 'failed to create vitamin'
+	    });
+	} else {
+	    res.locals.vitamin = vitamin;
+	    next();
+	}
     });
 };
 
