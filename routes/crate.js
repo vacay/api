@@ -6,7 +6,7 @@ var config = require('config-api'),
 
 var browse = function(req, res) {
     var offset = parseInt(req.param('offset'), 10) || 0;
-    var query = req.param('q') || null;
+    var query = unescape(req.param('q')) || null;
     var tags = req.param('tags') || [];
 
     tags = Array.isArray(tags) ? tags : [tags];

@@ -121,7 +121,7 @@ var subscribers = function(req, res) {
 
 var prescriptions = function(req, res) {
     var offset = parseInt(req.param('offset'), 10) || 0;
-    var query = req.param('q') || null;
+    var query = unescape(req.param('q')) || null;
     res.locals.user.prescriptions().query(function(qb) {
 	if (query) {
 	    qb.where('prescriptions.description', 'LIKE', '%' + query + '%');
