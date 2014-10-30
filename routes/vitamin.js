@@ -51,10 +51,12 @@ var create = function(req, res, next) {
 };
 
 var read = function(req, res) {
-    async.parallel({
 
+    async.parallel({
 	vitamin: function(cb) {
-	    res.locals.vitamin.fetch({
+	    db.model('Vitamin').forge({
+		id: res.locals.vitamin.id
+	    }).fetch({
 		withRelated: [
 		    'hosts',
 		    {
@@ -69,12 +71,15 @@ var read = function(req, res) {
 	},
 
 	prescribers: function(cb) {
-	    res.locals.vitamin.prescribers().exec(cb);
+	    db.model('Vitamin').forge({
+		id: res.locals.vitamin.id
+	    }).prescribers().exec(cb);
 	}
 
     }, function(err, results) {
 	if (err) log.error(err, res.locals.logRequest(req));
-	results.vitamin.set({prescribers: results.prescribers});
+	else results.vitamin.set({prescribers: results.prescribers});
+
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : results.vitamin.toJSON()
