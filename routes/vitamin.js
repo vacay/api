@@ -97,7 +97,7 @@ var update = function(req, res) {
 
 var browse = function(req, res) {
     var offset = parseInt(req.param('offset'), 10) || 0;
-    var query = unescape(req.param('q')) || null;
+    var query = req.param('q') ? unescape(req.param('q')) : null;
     var ids = req.param('ids') || [];
 
     async.waterfall([
