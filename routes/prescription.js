@@ -334,6 +334,7 @@ var browse = function(req, res) {
     var query = req.param('q') ? unescape(req.param('q')) : null;
     var ids = req.param('ids') || [];
 
+    var orderBy = req.param('orderby') || null;
 
     async.waterfall([
 
@@ -377,8 +378,18 @@ var browse = function(req, res) {
 			    .whereNotNull('prescriptions.published_at')
 			    .whereNull('prescriptions.parent_id')
 			    .limit(20)
-			    .offset(offset)
-			    .orderBy('published_at', 'desc');
+			    .offset(offset);
+
+			switch (orderBy) {
+
+			case 'random':
+			    qb.orderByRaw('RAND()');
+			    break;
+
+			default:
+			    qb.orderBy('published_at', 'desc');
+			    break;
+			}
 		    }
 		})
 		.fetch({
