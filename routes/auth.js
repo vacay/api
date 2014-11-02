@@ -121,7 +121,7 @@ module.exports.requestReset = function(req, res) {
 		expiresInMinutes: config.reset.expires
 	    });
 	    var emails = ['admin@vacay.io', user.attributes.email];
-	    var html = '<p>Forget your password did you? Use the link below to set a new one</p>';
+	    var body = 'Forget your password did you? Use the link below to set a new one';
 	    var link = {
 		target: '/inbox?reset=' + token,
 		text: 'reset password'
@@ -131,7 +131,7 @@ module.exports.requestReset = function(req, res) {
 		title: 'reset:' + user.attributes.email,
 		emails: emails,
 		subject: 'vacay - password reset',
-		html: html,
+		body: body,
 		link: link
 	    }).removeOnComplete(true).save();
 
