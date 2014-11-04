@@ -1,4 +1,4 @@
-/* global module, require */
+/* global module, require, unescape */
 
 var config = require('config-api'),
     log = require('log')(config.log),
@@ -38,6 +38,7 @@ var read = function(req, res) {
 	    },
 	    'prescriptions.prescriber',
 	    'prescriptions.vitamins',
+	    'prescriptions.vitamins.artists',
 	    'prescriptions.vitamins.hosts',
 	    {
 		'prescriptions.vitamins.tags': function(qb) {
@@ -136,6 +137,7 @@ var prescriptions = function(req, res) {
 	withRelated: [
 	    'prescriber',
 	    'vitamins',
+	    'vitamins.artists',
 	    'vitamins.hosts',
 	    {
 		'vitamins.tags': function(qb) {

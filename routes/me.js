@@ -103,6 +103,7 @@ var inbox = function(req, res) {
 		'prescriber',
 		'vitamins',
 		'vitamins.hosts',
+		'vitamins.artists',
 		{
 		    'vitamins.tags': function(qb) {
 			qb.where('tags.user_id', req.user.id);
@@ -172,6 +173,7 @@ var drafts = function(req, res) {
 	    withRelated: [
 		'prescriber',
 		'vitamins',
+		'vitamins.artists',
 		'vitamins.hosts',
 		{
 		    'vitamins.tags': function(qb) {
@@ -217,6 +219,7 @@ var tracker = function(req, res) {
 	    .orderBy('pages_vitamins.created_at', 'desc');
     }).fetch({
 	withRelated: [
+	    'artists',
 	    'hosts',
 	    'pages',
 	    {

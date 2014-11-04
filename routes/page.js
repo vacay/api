@@ -62,6 +62,7 @@ var read = function(req, res) {
 		}
 	    },
 	    'vitamins.hosts',
+	    'vitamins.artists',
 	    {
 		'vitamins.tags': function(qb) {
 		    qb.where('tags.user_id', req.user.id);

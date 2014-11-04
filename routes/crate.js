@@ -1,4 +1,4 @@
-/* global require, module */
+/* global require, module, unescape */
 
 var config = require('config-api'),
     log = require('log')(config.log),
@@ -36,6 +36,7 @@ var browse = function(req, res) {
 	qb.limit(50).offset(offset).groupBy('vitamins.id').orderBy('crates.created_at', 'desc');
     }).fetch({
 	withRelated: [
+	    'artists',
 	    'hosts',
 	    {
 		'craters': function(qb) {

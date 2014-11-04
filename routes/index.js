@@ -1,6 +1,7 @@
 /* global require, module */
 
-var auth = require('./auth'),
+var artist = require('./artist'),
+    auth = require('./auth'),
     me = require('./me'),
     message = require('./message'),
     page = require('./page'),
@@ -67,6 +68,25 @@ module.exports = function (app) {
 
     app.all('/v1/*',
 	    authenticate);
+
+    app.get('/v1/artists',
+	    isAuthenticated,
+	    artist.browse);
+
+    app.get('/v1/artist/:artist',
+	    isAuthenticated,
+	    artist.load,
+	    artist.read);
+
+    app.post('/v1/artist/:artist/subscribe',
+	    isAuthenticated,
+	    artist.load,
+	    artist.subscribe);
+
+    app.delete('/v1/artist/:artist/subscribe',
+	   isAuthenticated,
+	   artist.load,
+	   artist.unsubscribe);
 
     app.get('/v1/auth/reset',
 	    hasParams(['email']),

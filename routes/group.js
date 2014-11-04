@@ -1,4 +1,4 @@
-/* global module, require */
+/* global module, require, unescape */
 
 var config = require('config-api'),
     async = require('async'),
@@ -92,6 +92,7 @@ var read = function(req, res) {
 	    'prescriptions',
 	    'prescriptions.prescriber',
 	    'prescriptions.vitamins',
+	    'prescriptions.vitamins.artists',
 	    'prescriptions.vitamins.hosts',
 	    {
 		'prescriptions.vitamins.craters': function(qb) {

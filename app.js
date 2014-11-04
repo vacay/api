@@ -4,8 +4,6 @@ var config = require('config-api'),
     log = require('log')(config.log);
 
 var express = require('express'),
-    cluster = require('cluster'),
-    os = require('os'),
     kue = require('kue'),
     elasticsearch = require('elasticsearch'),
     onHeaders = require('on-headers'),

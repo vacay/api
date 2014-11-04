@@ -1,4 +1,4 @@
-/* global require, module */
+/* global require, module, unescape */
 
 var config = require('config-api'),
     log = require('log')(config.log),
@@ -59,6 +59,7 @@ var read = function(req, res) {
 	    }).fetch({
 		withRelated: [
 		    'hosts',
+		    'artists',
 		    {
 			'tags': function(qb) {
 			    qb.where('tags.user_id', req.user.id);
@@ -149,6 +150,7 @@ var browse = function(req, res) {
 		    }
 		})
 		.fetch({ withRelated: [
+		    'artists',
 		    'hosts',
 		    {
 			'tags': function(qb) {
