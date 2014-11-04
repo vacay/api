@@ -3,15 +3,15 @@
 var create = function(req, res) {
     var emails = ['kr@vacay.io'];
     var subject = '[contact] ' + req.param('subject');
-    var html = '<p>' + req.param('body') + '</p>';
-    html += '- ' + req.param('name');
+    var body = req.param('body');
+    body += '\n\n- ' + req.param('name');
 
     res.locals.queue.create('email', {
 	title: 'contact:' + req.param('email'),
 	emails: emails,
 	replyTo: req.param('email'),
 	subject: subject,
-	html: html
+	body: body
     }).removeOnComplete(true).save();
 
     res.status(200).send({
