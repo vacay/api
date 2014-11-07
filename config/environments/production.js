@@ -22,8 +22,8 @@ module.exports = {
     },
 
     s3: {
-	key: 'AKIAJNZCI6UWMG3BNCVA',
-	secret: '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',
+	key: 'AKIAIAQL5YQHQISA76FQ',
+	secret: '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',
 	bucket: 'vacay',
 	folder: 'production'
     },
