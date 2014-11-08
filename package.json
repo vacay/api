@@ -9,8 +9,10 @@
 	"url": "https://github.com/vacay/api"
     },
     "scripts": {
-	"postinstall": "npm link config/environments",
-	"postupdate": "npm link config/environments"
+	"preinstall": "npm unlink config",
+	"preupdate": "npm unlink config",
+	"postinstall": "npm link config",
+	"postupdate": "npm link config"
     },
     "homepage": "http://vacay.io/",
     "licenses": "MIT",

@@ -4,9 +4,7 @@ var config = require('config-api'),
     log = require('log')(config.log),
     redis = require('redis');
 
-var client = redis.createClient(config.redis.port, config.redis.host, {
-    auth_pass: config.redis.auth_pass
-});
+var client = redis.createClient(config.redis.port, config.redis.host, config.redis.options);
 
 client.on('error', function(err) {
     log.error('redis error: ', err);
