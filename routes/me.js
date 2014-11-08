@@ -139,7 +139,7 @@ var policy = function() {
 		acl: 'public-read'
 	    }, {
 		success_action_status: '201'
-	    }, ['starts-with', '$key', '']
+	    }, ['starts-with', '$key', config.s3.folder + '/tmp']
 	]
     };
     return new Buffer(JSON.stringify(s3Policy)).toString('base64');
