@@ -128,6 +128,16 @@ module.exports = function (app) {
 	    discussion.load,
 	    discussion.update);
 
+    app.post('/v1/discussion/:discussion/watch',
+	     isAuthenticated,
+	     discussion.load,
+	     discussion.watch);
+
+    app.delete('/v1/discussion/:discussion/watch',
+	       isAuthenticated,
+	       discussion.load,
+	       discussion.unwatch);
+
     app.post('/v1/discussion/:discussion/vote',
 	     isAuthenticated,
 	     hasParams(['vote']),

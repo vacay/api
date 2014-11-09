@@ -84,6 +84,7 @@ var read = function(req, res) {
     res.locals.discussion.fetch({
 	withRelated: [
 	    'user',
+	    'watchers',
 	    'votes',
 	    'comments',
 	    'comments.user',
@@ -131,6 +132,32 @@ var create = function(req, res) {
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : discussion.toJSON()
+	});
+    });
+};
+
+var watchDiscussion = function(req, res) {
+    db.knex('discussions_users').insert({
+	discussion_id: res.locals.discussion.id,
+	user_id: req.user.id
+    }).exec(function(err, row) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: row
+	});
+    });
+};
+
+var unwatchDiscussion = function(req, res) {
+    db.knex('discussions_users').where({
+	discussion_id: res.locals.discussion.id,
+	user_id: req.user.id
+    }).del().exec(function(err, rows) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: rows
 	});
     });
 };
@@ -324,6 +351,8 @@ module.exports = {
     create: create,
     read: read,
     update: update,
+    watch: watchDiscussion,
+    unwatch: unwatchDiscussion,
     createDiscussionVote: createDiscussionVote,
     destroyDiscussionVote: destroyDiscussionVote,
     loadComment: loadComment,
