@@ -32,15 +32,151 @@ var read = function(req, res) {
 	id: res.locals.artist.id
     }).fetch({
 	withRelated: [
-	    'vitamins',
-	    'originals',
-	    'variations'
+	    {
+		'vitamins': function(qb) {
+		    qb.limit(20);
+		}
+	    },
+	    'vitamins.hosts',
+	    'vitamins.artists',
+	    {
+		'vitamins.tags': function(qb) {
+		    qb.where('tags.user_id', req.user.id);
+		}
+	    },
+	    'vitamins.craters'
 	]
     }).exec(function(err, artist) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : artist.toJSON()
+	});
+    });
+};
+
+var vitamins = function(req, res) {
+    var offset = parseInt(req.param('offset'), 10) || 0;
+    var query = req.param('q') ? unescape(req.param('q')) : null;
+
+    res.locals.artist.vitamins().query(function(qb) {
+	if (query) {
+	    qb.where(function() {
+		var terms = query.split(' ');
+		for (var i=0; i<terms.length; i++) {
+		    if (i === 0) {
+			this.where('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    } else {
+			this.orWhere('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    }
+		}
+	    });
+	}
+	qb.limit(20).offset(offset);
+    }).fetch({
+	withRelated: [
+	    'hosts',
+	    'artists',
+	    {
+		'tags': function(qb) {
+		    qb.where('tags.user_id', req.user.id);
+		}
+	    },
+	    {
+		'craters': function(qb) {
+		    qb.where('crates.user_id', req.user.id);
+		}
+	    }
+	]
+    }).exec(function(err, vitamins) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : vitamins.toJSON()
+	});
+    });
+};
+
+var originals = function(req, res) {
+    var offset = parseInt(req.param('offset'), 10) || 0;
+    var query = req.param('q') ? unescape(req.param('q')) : null;
+
+    res.locals.artist.originals().query(function(qb) {
+	if (query) {
+	    qb.where(function() {
+		var terms = query.split(' ');
+		for (var i=0; i<terms.length; i++) {
+		    if (i === 0) {
+			this.where('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    } else {
+			this.orWhere('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    }
+		}
+	    });
+	}
+	qb.limit(20).offset(offset);
+    }).fetch({
+	withRelated: [
+	    'hosts',
+	    'artists',
+	    {
+		'tags': function(qb) {
+		    qb.where('tags.user_id', req.user.id);
+		}
+	    },
+	    {
+		'craters': function(qb) {
+		    qb.where('crates.user_id', req.user.id);
+		}
+	    }
+	]
+    }).exec(function(err, vitamins) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : vitamins.toJSON()
+	});
+    });
+};
+
+var variations = function(req, res) {
+    var offset = parseInt(req.param('offset'), 10) || 0;
+    var query = req.param('q') ? unescape(req.param('q')) : null;
+
+    res.locals.artist.variations().query(function(qb) {
+	if (query) {
+	    qb.where(function() {
+		var terms = query.split(' ');
+		for (var i=0; i<terms.length; i++) {
+		    if (i === 0) {
+			this.where('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    } else {
+			this.orWhere('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    }
+		}
+	    });
+	}
+	qb.limit(20).offset(offset);
+    }).fetch({
+	withRelated: [
+	    'hosts',
+	    'artists',
+	    {
+		'tags': function(qb) {
+		    qb.where('tags.user_id', req.user.id);
+		}
+	    },
+	    {
+		'craters': function(qb) {
+		    qb.where('crates.user_id', req.user.id);
+		}
+	    }
+	]
+    }).exec(function(err, vitamins) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : vitamins.toJSON()
 	});
     });
 };
@@ -121,6 +257,9 @@ var unsubscribe = function(req, res) {
 module.exports = {
     load: load,
     read: read,
+    vitamins: vitamins,
+    originals: originals,
+    variations: variations,
     browse: browse,
     subscribe: subscribe,
     unsubscribe: unsubscribe

@@ -78,6 +78,21 @@ module.exports = function (app) {
 	    artist.load,
 	    artist.read);
 
+    app.get('/v1/artist/:artist/vitamins',
+	    isAuthenticated,
+	    artist.load,
+	    artist.vitamins);
+
+    app.get('/v1/artist/:artist/originals',
+	    isAuthenticated,
+	    artist.load,
+	    artist.originals);
+
+    app.get('/v1/artist/:artist/variations',
+	    isAuthenticated,
+	    artist.load,
+	    artist.variations);
+
     app.post('/v1/artist/:artist/subscribe',
 	    isAuthenticated,
 	    artist.load,
