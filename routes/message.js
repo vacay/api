@@ -3,8 +3,7 @@
 var create = function(req, res) {
     var emails = ['kr@vacay.io'];
     var subject = '[contact] ' + req.param('subject');
-    var body = req.param('body');
-    body += '\n\n- ' + req.param('name');
+    var body = req.param('name') + ' - ' + req.param('body');
 
     res.locals.queue.create('email', {
 	title: 'contact:' + req.param('email'),
