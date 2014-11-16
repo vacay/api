@@ -165,6 +165,51 @@ var prescriptions = function(req, res) {
     });
 };
 
+var pages = function(req, res) {
+    var offset = parseInt(req.param('offset'), 10) || 0;
+
+    res.locals.user.pages().query({
+	limit: 20,
+	offset: offset
+    }).fetch().exec(function(err, pages) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : pages.toJSON()
+	});
+    });
+};
+
+var crate = function(req, res) {
+    var offset = parseInt(req.param('offset'), 10) || 0;
+
+    res.locals.user.crate().query({
+	limit: 20,
+	offset: offset
+    }).fetch({
+	withRelated: [
+	    'artists',
+	    'hosts',
+	    {
+		'craters': function(qb) {
+		    qb.where('crates.user_id', req.user.id);
+		}
+	    },
+	    {
+		'tags': function(qb) {
+		    qb.where('tags.user_id', req.user.id);
+		}
+	    }
+	]
+    }).exec(function(err, vitamins) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : vitamins.toJSON()
+	});
+    });
+};
+
 var browse = function(req, res) {
     var offset = parseInt(req.param('offset'), 10) || 0;
     var query = req.param('q') || null;
@@ -239,5 +284,7 @@ module.exports = {
     update: update,
     subscribers: subscribers,
     prescriptions: prescriptions,
+    pages: pages,
+    crate: crate,
     browse: browse
 };

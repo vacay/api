@@ -342,6 +342,16 @@ module.exports = function (app) {
 	    user.load,
 	    user.prescriptions);
 
+    app.get('/v1/user/:user/pages',
+	    isAuthenticated,
+	    user.load,
+	    user.pages);
+
+    app.get('/v1/user/:user/crate',
+	    isAuthenticated,
+	    user.load,
+	    user.crate);
+
     app.get('/v1/vitamins',
 	    isAuthenticated,
 	    vitamin.browse);
