@@ -183,9 +183,8 @@ var pages = function(req, res) {
 var crate = function(req, res) {
     var offset = parseInt(req.param('offset'), 10) || 0;
 
-    res.locals.user.crate().query({
-	limit: 20,
-	offset: offset
+    res.locals.user.crate().query(function(qb) {
+	qb.limit(20).offset(offset).orderBy('crates.created_at', 'desc');
     }).fetch({
 	withRelated: [
 	    'artists',
