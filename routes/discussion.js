@@ -40,12 +40,15 @@ var nestComments = function(comments) {
 var browse = function(req, res) {
     var offset = parseInt(req.param('offset'), 10) || 0;
     var closed = req.param('closed') ? (req.param('closed') === 'true' ? true : false) : false;
+    var is_sticky = req.param('sticky') ? (req.param('sticky') === 'true' ? true : false) : false;
+
     db.model('Discussion')
 	.collection()
 	.query(function(qb) {
 	    qb.count('comments.id as total_comments')
 		.leftJoin('comments', 'discussions.id', 'comments.discussion_id')
 		.where('discussions.closed', closed)
+		.where('discussions.is_sticky', is_sticky)
 		.groupBy('discussions.id')
 		.limit(20).offset(offset).orderBy('updated_at', 'desc');
 	})
