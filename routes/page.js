@@ -54,7 +54,7 @@ var create = function(req, res, next) {
 };
 
 var read = function(req, res) {
-    res.locals.page.fetch({
+    db.model('Page').forge({id: res.locals.page.id }).fetch({
 	withRelated: [
 	    {
 		'vitamins': function(qb) {
