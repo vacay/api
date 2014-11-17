@@ -54,11 +54,11 @@ var create = function(req, res, next) {
 };
 
 var read = function(req, res) {
-    db.model('Page').forge({id: res.locals.page.id}).fetch({
+    res.locals.page.fetch({
 	withRelated: [
 	    {
 		'vitamins': function(qb) {
-		    qb.where('on_page', true);
+		    qb.limit(20).orderBy('pages_vitamins.created_at', 'desc');
 		}
 	    },
 	    'vitamins.hosts',
@@ -90,6 +90,36 @@ var read = function(req, res) {
     });
 };
 
+var vitamins = function(req, res) {
+    var offset = parseInt(req.param('offset'), 10) || 0;
+
+    res.locals.page.vitamins().query(function(qb) {
+	qb.limit(20).offset(offset).orderBy('pages_vitamins.created_at', 'desc');
+    }).fetch({
+	withRelated: [
+	    'hosts',
+	    'artists',
+	    {
+		'tags': function(qb) {
+		    qb.where('tags.user_id', req.user.id);
+		}
+	    },
+	    {
+		'craters': function(qb) {
+		    qb.where('crates.user_id', req.user.id);
+		}
+	    }
+	]
+    }).exec(function(err, vitamins) {
+	if (err) log.error(err, res.locals.logRequest(req));
+
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : vitamins.toJSON()
+	});
+    });
+};
+
 var track = function(req, res) {
     res.locals.page.related('users').attach(req.user.id).exec(function(err, relation) {
 	res.status(err ? 500 : 200).send({
@@ -112,6 +142,7 @@ module.exports = {
     load: load,
     create: create,
     read: read,
+    vitamins: vitamins,
     track: track,
     untrack: untrack
 };

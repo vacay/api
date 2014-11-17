@@ -276,6 +276,11 @@ module.exports = function (app) {
 	    page.load,
 	    page.read);
 
+    app.get('/v1/page/:page/vitamins',
+	    isAuthenticated,
+	    page.load,
+	    page.vitamins);
+
     app.post('/v1/page/:page/track',
 	     isAuthenticated,
 	     page.load,
