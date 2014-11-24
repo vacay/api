@@ -74,6 +74,7 @@ var update = function(req, res) {
     if (typeof req.param('name') !== 'undefined') params.name = req.param('name');
     if (typeof req.param('email') !== 'undefined') params.email = req.param('email');
     if (typeof req.param('notification') !== 'undefined') params.notification = req.param('notification');
+    if (typeof req.param('public_crate') !== 'undefined') params.public_crate = req.param('public_crate');
     if (typeof req.param('bio') !== 'undefined') params.bio = req.param('bio');
     if (typeof req.param('location') !== 'undefined') params.location = req.param('location');
     if (typeof req.param('avatar') !== 'undefined') params.avatar = req.param('avatar');
@@ -181,6 +182,15 @@ var pages = function(req, res) {
 };
 
 var crate = function(req, res) {
+
+    if (!res.locals.user.public_crate && req.user.id !== res.locals.user.id) {
+	res.status(401).send({
+	    session: req.user,
+	    data: 'unauthorized access to private crate'
+	});
+	return;
+    }
+
     var offset = parseInt(req.param('offset'), 10) || 0;
 
     res.locals.user.crate().query(function(qb) {
