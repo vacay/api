@@ -253,7 +253,13 @@ var tags = function(req, res) {
 };
 
 var watching = function(req, res) {
-    db.model('User').forge({id: req.user.id}).watching().fetch().exec(function(err, discussions) {
+    db.model('User').forge({id: req.user.id}).watching().fetch({
+	withRelated: [
+	    'user',
+	    'watchers',
+	    'votes'
+	]
+    }).exec(function(err, discussions) {
 	if (err) log.error(err, res.locals.logRequesst(req));
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
