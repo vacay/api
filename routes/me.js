@@ -252,6 +252,16 @@ var tags = function(req, res) {
     });
 };
 
+var watching = function(req, res) {
+    db.model('User').forge({id: req.user.id}).watching().fetch().exec(function(err, discussions) {
+	if (err) log.error(err, res.locals.logRequesst(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : discussions.toJSON()
+	});
+    });
+};
+
 
 module.exports = {
     index: index,
@@ -260,5 +270,6 @@ module.exports = {
     drafts: drafts,
     pages: pages,
     tracker: tracker,
-    tags: tags
+    tags: tags,
+    watching: watching
 };

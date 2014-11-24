@@ -260,6 +260,10 @@ module.exports = function (app) {
 	     hasParams(['ext']),
 	     me.upload);
 
+    app.get('/v1/me/watching',
+	    isAuthenticated,
+	    me.watching);
+
     app.post('/v1/message',
 	     hasParams(['name', 'email', 'subject', 'body']),
 	     message.create);
