@@ -183,7 +183,7 @@ var pages = function(req, res) {
 
 var crate = function(req, res) {
 
-    if (!res.locals.user.public_crate && req.user.id !== res.locals.user.id) {
+    if (!res.locals.user.attributes.public_crate && req.user.id !== res.locals.user.id) {
 	res.status(401).send({
 	    session: req.user,
 	    data: 'unauthorized access to private crate'
