@@ -6,7 +6,7 @@ var config = require('config-api'),
     fs = require('fs'),
     log = require('log')(config.log);
 
-module.exports = function(io, queue) {
+module.exports = function(io, queue, redis) {
 
     var listenersDir = __dirname + '/../sockets';
     var files = fs.readdirSync(listenersDir).sort();
@@ -30,7 +30,7 @@ module.exports = function(io, queue) {
 	    log.debug('successful socket connection to', socket.decoded_token.username);
 
 	    listeners.forEach(function(listener) {
-		listener(io, socket, queue);
+		listener(io, socket, redis, queue);
 	    });
 	});
     });

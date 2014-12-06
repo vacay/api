@@ -14,6 +14,7 @@ var express = require('express'),
     methodOverride = require('method-override'),
     morgan = require('morgan'),
     socketio = require('socket.io'),
+    redis = require('redis'),
     http = require('http');
 
 var socket = require('./modules/socket');
@@ -21,6 +22,11 @@ var routes = require('./routes');
 var queue = kue.createQueue(config.queue);
 var stats = new StatsD(config.stats);
 var es = new elasticsearch.Client(config.elasticsearch);
+var client = redis.createClient(config.redis.port, config.redis.host, config.redis.options);
+
+client.on('error', function(err) {
+    log.error('redis error: ', err);
+});
 
 queue.on('error', function(err) {
     log.error('kue error: ', err);
@@ -115,7 +121,7 @@ io.use(socketioJwt.authorize({
     handshake: true
 }));
 
-socket(io, queue);
+socket(io, queue, client);
 
 server.listen(port, function () {
     log.info(config.title + ' listening on ' + port + ' in ' + env);

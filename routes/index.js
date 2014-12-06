@@ -208,6 +208,21 @@ module.exports = function (app) {
 	    group.load,
 	    group.update);
 
+    app.get('/v1/group/:group/tracker',
+	    isAuthenticated,
+	    group.load,
+	    group.tracker);
+
+    app.post('/v1/group/:group/page/:page/track',
+	     group.load,
+	     page.load,
+	     group.track);
+
+    app.delete('/v1/group/:group/page/:page/track',
+	       group.load,
+	       page.load,
+	       group.untrack);
+
     app.post('/v1/group/:group/subscription',
 	     isAuthenticated,
 	     group.load,

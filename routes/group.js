@@ -89,6 +89,7 @@ var read = function(req, res) {
     res.locals.group.fetch({
 	withRelated: [
 	    'admins',
+	    'pages',
 	    'prescriptions',
 	    'prescriptions.prescriber',
 	    'prescriptions.vitamins',
@@ -169,7 +170,9 @@ var browse = function(req, res) {
 		    }
 		}).fetch({
 		    withRelated: [
-			'admins'
+			'admins',
+			'pageCount',
+			'prescriptionCount'
 		    ]
 		}).exec(callback);
 	}
@@ -195,11 +198,72 @@ var browse = function(req, res) {
 
 };
 
+var tracker = function(req, res) {
+    var offset = parseInt(req.param('offset'), 10) || 0;
+    db.model('Vitamin').collection().query(function(qb) {
+	qb.innerJoin('pages_vitamins', 'vitamins.id', 'pages_vitamins.vitamin_id')
+	    .innerJoin('groups_pages', 'pages_vitamins.page_id', 'groups_pages.page_id')
+	    .where('groups_pages.group_id', res.locals.group.id)
+	    .offset(offset)
+	    .limit(50)
+	    .groupBy('id')
+	    .orderBy('pages_vitamins.created_at', 'desc');
+    }).fetch({
+	withRelated: [
+	    'artists',
+	    'hosts',
+	    'pages',
+	    {
+		tags: function(qb) {
+		    qb.where('tags.user_id', req.user.id);
+		}
+	    },
+	    {
+		craters: function(qb) {
+		    qb.where('crates.user_id', req.user.id);
+		}
+	    }
+	]
+    }).exec(function(err, vitamins) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : vitamins.toJSON()
+	});
+    });
+};
+
+var track = function(req, res) {
+    res.locals.group.related('pages').attach({
+	page_id: res.locals.page.id,
+	created_at: new Date()
+    }).exec(function(err, relation) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : relation.toJSON()
+	});
+    });
+};
+
+var untrack = function(req, res) {
+    res.locals.group.related('pages').detach(res.locals.page.id).exec(function(err, relation) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : relation.toJSON()
+	});
+    });
+};
+
 
 module.exports = {
     load: load,
     create: create,
     update: update,
+    tracker: tracker,
+    track: track,
+    untrack: untrack,
     read: read,
     browse: browse
 };

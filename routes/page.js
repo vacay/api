@@ -122,6 +122,7 @@ var vitamins = function(req, res) {
 
 var track = function(req, res) {
     res.locals.page.related('users').attach(req.user.id).exec(function(err, relation) {
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : relation.toJSON()
@@ -131,6 +132,7 @@ var track = function(req, res) {
 
 var untrack = function(req, res) {
     res.locals.page.related('users').detach(req.user.id).exec(function(err, relation) {
+	if (err) log.error(err, res.locals.logRequest(req));
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? err : relation.toJSON()

@@ -1,18 +1,11 @@
 /* global module */
 
 var config = require('config-api'),
-    log = require('log')(config.log),
-    redis = require('redis');
-
-var client = redis.createClient(config.redis.port, config.redis.host, config.redis.options);
-
-client.on('error', function(err) {
-    log.error('redis error: ', err);
-});
+    log = require('log')(config.log);
 
 var EXPIRES = 604800;
 
-module.exports = function(io, socket) {
+module.exports = function(io, socket, redis) {
 
     var user = socket.decoded_token.username;
 
@@ -25,8 +18,8 @@ module.exports = function(io, socket) {
 		playing: false
 	    };
 
-	    client.set(user + ':css', JSON.stringify(data));
-	    client.expire(user + ':css', EXPIRES);
+	    redis.set(user + ':css', JSON.stringify(data));
+	    redis.expire(user + ':css', EXPIRES);
 	    socket.to(user).emit('player:stop');
 	    socket.to(user).emit('player:css:update', data);
 	    socket.to(user).emit('player:loading:update', {
@@ -63,7 +56,7 @@ module.exports = function(io, socket) {
 
 	socket.emit(master === socket.id ? 'master' : 'remote');
 
-	client.get(user + ':queue', function(err, reply) {
+	redis.get(user + ':queue', function(err, reply) {
 	    if (err) log.error(err);
 	    else {
 		var data = JSON.parse(reply);
@@ -75,7 +68,7 @@ module.exports = function(io, socket) {
 	    }
 	});
 
-	client.get(user + ':nowplaying', function(err, reply) {
+	redis.get(user + ':nowplaying', function(err, reply) {
 	    if (err) log.error(err);
 	    else {
 		var data = JSON.parse(reply);
@@ -87,7 +80,7 @@ module.exports = function(io, socket) {
 	    }
 	});
 
-	client.get(user + ':css', function(err, reply) {
+	redis.get(user + ':css', function(err, reply) {
 	    if (err) log.error(err);
 	    else {
 		var data = JSON.parse(reply);
@@ -95,7 +88,7 @@ module.exports = function(io, socket) {
 	    }
 	});
 
-	client.get(user + ':volume', function(err, reply) {
+	redis.get(user + ':volume', function(err, reply) {
 	    if (err) log.error(err);
 	    else {
 		var data = JSON.parse(reply);
@@ -104,7 +97,6 @@ module.exports = function(io, socket) {
 		});
 	    }
 	});
-
 
 	if (count > 1) {
 
@@ -144,8 +136,8 @@ module.exports = function(io, socket) {
 	socket.on('player:css:update', function(data) {
 	    log.debug(data);
 
-	    client.set(user + ':css', JSON.stringify(data));
-	    client.expire(user + ':css', EXPIRES);
+	    redis.set(user + ':css', JSON.stringify(data));
+	    redis.expire(user + ':css', EXPIRES);
 
 	    socket.to(user).emit('player:css:update', data);
 	});
@@ -153,8 +145,8 @@ module.exports = function(io, socket) {
 	socket.on('queue:update', function(data) {
 	    log.debug(data);
 
-	    client.set(user + ':queue', JSON.stringify(data.queue));
-	    client.expire(user + ':queue', EXPIRES);
+	    redis.set(user + ':queue', JSON.stringify(data.queue));
+	    redis.expire(user + ':queue', EXPIRES);
 
 	    socket.to(user).emit('queue:update', data);
 	});
@@ -162,16 +154,16 @@ module.exports = function(io, socket) {
 	socket.on('player:nowplaying:update', function(data) {
 	    log.debug(data);
 
-	    client.set(user + ':nowplaying', JSON.stringify(data.nowplaying));
-	    client.expire(user + ':nowplaying', EXPIRES);
+	    redis.set(user + ':nowplaying', JSON.stringify(data.nowplaying));
+	    redis.expire(user + ':nowplaying', EXPIRES);
 
 	    socket.broadcast.emit('vitamin:play', data.nowplaying);
 	    socket.to(user).emit('player:nowplaying:update', data);
 	});
 
 	socket.on('player:volume', function(data) {
-	    client.set(user + ':volume', JSON.stringify(data.volume));
-	    client.expire(user + ':volume', EXPIRES);
+	    redis.set(user + ':volume', JSON.stringify(data.volume));
+	    redis.expire(user + ':volume', EXPIRES);
 
 	    socket.to(user).emit('player:volume', data);
 	});
