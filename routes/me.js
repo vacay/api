@@ -209,6 +209,7 @@ var pages = function(req, res) {
 
 var tracker = function(req, res) {
     var offset = parseInt(req.param('offset'), 10) || 0;
+    var ids = req.param('ids') || [];
     db.model('Vitamin').collection().query(function(qb) {
 	qb.innerJoin('pages_vitamins', 'vitamins.id', 'pages_vitamins.vitamin_id')
 	    .innerJoin('pages_users', 'pages_vitamins.page_id', 'pages_users.page_id')
@@ -217,6 +218,8 @@ var tracker = function(req, res) {
 	    .limit(50)
 	    .groupBy('id')
 	    .orderBy('pages_vitamins.created_at', 'desc');
+
+	if (ids.length) qb.whereIn('pages_users.page_id', ids);
     }).fetch({
 	withRelated: [
 	    'artists',
