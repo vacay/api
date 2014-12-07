@@ -246,10 +246,12 @@ module.exports = function (app) {
 	    isAuthenticated,
 	    me.index);
 
+    //TODO: deprecate
     app.get('/v1/me/crate',
 	    isAuthenticated,
 	    crate.browse);
 
+    //TODO: deprecate
     app.get('/v1/me/tags',
 	    isAuthenticated,
 	    me.tags);
@@ -361,20 +363,25 @@ module.exports = function (app) {
 	    user.load,
 	    user.subscribers);
 
-    app.get('/v1/user/:user/prescriptions',
+    app.get('/v1/user/:user/crate',
 	    isAuthenticated,
 	    user.load,
-	    user.prescriptions);
+	    user.crate);
 
     app.get('/v1/user/:user/pages',
 	    isAuthenticated,
 	    user.load,
 	    user.pages);
 
-    app.get('/v1/user/:user/crate',
+    app.get('/v1/user/:user/prescriptions',
 	    isAuthenticated,
 	    user.load,
-	    user.crate);
+	    user.prescriptions);
+
+    app.get('/v1/user/:user/tags',
+	    isAuthenticated,
+	    user.load,
+	    user.tags);
 
     app.get('/v1/vitamins',
 	    isAuthenticated,

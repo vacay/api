@@ -192,9 +192,32 @@ var crate = function(req, res) {
     }
 
     var offset = parseInt(req.param('offset'), 10) || 0;
+    var query = req.param('q') ? unescape(req.param('q')) : null;
+    var tags = req.param('tags') || [];
+
+    tags = Array.isArray(tags) ? tags : [tags];
 
     res.locals.user.crate().query(function(qb) {
-	qb.limit(20).offset(offset).orderBy('crates.created_at', 'desc');
+	if (tags.length) {
+	    qb.innerJoin('tags', 'vitamins.id', 'tags.vitamin_id')
+		.where('tags.user_id', res.locals.user.id)
+		.whereIn('tags.value', tags)
+		.havingRaw('COUNT(DISTINCT tags.value) = ?', tags.length);
+	}
+
+	if (query) {
+	    qb.where(function() {
+		var terms = query.split(' ');
+		for (var i=0; i<terms.length; i++) {
+		    if (i === 0) {
+			this.where('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    } else {
+			this.orWhere('vitamins.title', 'LIKE', '%' + terms[i] + '%');
+		    }
+		}
+	    });
+	}
+	qb.limit(50).offset(offset).groupBy('vitamins.id').orderBy('crates.created_at', 'desc');
     }).fetch({
 	withRelated: [
 	    'artists',
@@ -287,6 +310,16 @@ var browse = function(req, res) {
     });
 };
 
+var tags = function(req, res) {
+    res.locals.user.tags().fetch().exec(function(err, tags) {
+	if (err) log.error(err, res.locals.logRequest(req));
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : tags.toJSON()
+	});
+    });
+};
+
 module.exports = {
     load: load,
     read: read,
@@ -295,5 +328,6 @@ module.exports = {
     prescriptions: prescriptions,
     pages: pages,
     crate: crate,
-    browse: browse
+    browse: browse,
+    tags: tags
 };
