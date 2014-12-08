@@ -113,7 +113,7 @@ var browse = function(req, res) {
 		res.locals.es.search({
 		    index: 'vcy',
 		    type: 'vitamins',
-		    q: query,
+		    q: utils.escape(query),
 		    size: 10,
 		    from: offset
 		}, callback);

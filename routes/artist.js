@@ -2,6 +2,7 @@
 
 var config = require('config-api'),
     async = require('async'),
+    utils = require('../lib/utils'),
     log = require('log')(config.log),
     db = require('db')(config);
 
@@ -193,7 +194,7 @@ var browse = function(req, res) {
 		res.locals.es.search({
 		    index: 'vcy',
 		    type: 'artists',
-		    q: query,
+		    q: utils.escape(query),
 		    size: 10,
 		    from: offset
 		}, callback);
@@ -228,10 +229,18 @@ var browse = function(req, res) {
 	    }
 	}
     ], function(err, artists) {
+	var data = [];
 	if (err) log.error(err, res.locals.logRequest(req));
+	else {
+	    data = !artists ? [] : artists.toJSON();
+
+	    if (ids.length) {
+		utils.orderArray(ids, data);
+	    }
+	}
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
-	    data: err ? err : artists.toJSON()
+	    data: err ? err : data
 	});
     });
 };

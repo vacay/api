@@ -254,7 +254,7 @@ var browse = function(req, res) {
 		res.locals.es.search({
 		    index: 'vcy',
 		    type: 'users',
-		    q: query,
+		    q: utils.escape(query),
 		    size: 10
 		}, callback);
 	    } else {
