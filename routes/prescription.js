@@ -337,6 +337,7 @@ var browse = function(req, res) {
 
     var orderBy = req.param('orderby') || null;
 
+    //TODO: fix size/limit mismatch
     async.waterfall([
 
 	function(callback) {
@@ -345,7 +346,8 @@ var browse = function(req, res) {
 		    index: 'vcy',
 		    type: 'prescriptions',
 		    q: query,
-		    size: 10
+		    size: 10,
+		    from: offset
 		}, callback);
 	    } else {
 		callback(null, null, null);

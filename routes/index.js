@@ -285,6 +285,10 @@ module.exports = function (app) {
 	     hasParams(['name', 'email', 'subject', 'body']),
 	     message.create);
 
+    app.get('/v1/page',
+	    isAuthenticated,
+	    page.browse);
+
     //backward compatible for chrome ext
     app.post('/v1/page',
 	     isAuthenticated,

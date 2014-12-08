@@ -3,6 +3,8 @@
 var URI = require('URIjs'),
     config = require('config-api'),
     log = require('log')(config.log),
+    async = require('async'),
+    utils = require('../lib/utils'),
     db = require('db')(config);
 
 
@@ -26,6 +28,80 @@ var load = function(req, res, next) {
 	    next();
 	}
     });
+};
+
+var browse = function(req, res) {
+    var offset = parseInt(req.param('offset'), 10) || 0;
+    var query = req.param('q') ? unescape(req.param('q')) : null;
+    var ids = req.param('ids') || [];
+
+    async.waterfall([
+
+	function(callback) {
+	    if (query) {
+		res.locals.es.search({
+		    index: 'vcy',
+		    type: 'pages',
+		    q: query,
+		    size: 10,
+		    from: offset
+		}, callback);
+	    } else {
+		callback(null, null, null);
+	    }
+	},
+
+	function(search, status, callback) {
+
+	    if (search) {
+		ids = [];
+		var hits = search.hits.hits;
+		for(var i=0; i<hits.length; i++) {
+		    ids.push(hits[i]._source.id);
+		}
+		if (!ids.length) {
+		    callback(null, null);
+		    return;
+		}
+	    }
+
+	    if (ids && !Array.isArray(ids)) ids = [ids];
+	    db.model('Page')
+		.collection()
+		.query(function(qb) {
+		    if (ids.length) {
+			qb.whereIn('id', ids);
+		    } else {
+			qb.limit(10)
+			    .offset(offset)
+			    .orderBy('created_at', 'desc');
+		    }
+		}).fetch({
+		    withRelated: [
+			'vitaminCount'
+		    ]
+		}).exec(callback);
+	}
+
+    ], function(err, pages) {
+
+	var data = [];
+
+	if (err) log.error(err, res.locals.logRequest(req));
+	else {
+	    data = !pages ? [] : pages.toJSON();
+
+	    if (ids.length) {
+		utils.orderArray(ids, data);
+	    }
+	}
+
+	res.status(err ? 500 : 200).send({
+	    session: req.user,
+	    data: err ? err : data
+	});
+    });
+
 };
 
 var create = function(req, res, next) {
@@ -142,6 +218,7 @@ var untrack = function(req, res) {
 
 module.exports = {
     load: load,
+    browse: browse,
     create: create,
     read: read,
     vitamins: vitamins,

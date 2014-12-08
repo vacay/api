@@ -136,7 +136,8 @@ var browse = function(req, res) {
 		    index: 'vcy',
 		    type: 'groups',
 		    q: query,
-		    size: 5
+		    size: 10,
+		    from: offset
 		}, callback);
 	    } else {
 		callback(null, null, null);

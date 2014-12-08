@@ -255,7 +255,7 @@ var browse = function(req, res) {
 		    index: 'vcy',
 		    type: 'users',
 		    q: query,
-		    size: 5
+		    size: 10
 		}, callback);
 	    } else {
 		callback(null, null, null);
@@ -283,7 +283,7 @@ var browse = function(req, res) {
 		    if (ids.length) {
 			qb.whereIn('id', ids);
 		    } else {
-			qb.limit(20)
+			qb.limit(10)
 			    .offset(offset)
 			    .orderBy('created_at', 'desc');
 		    }

@@ -144,7 +144,7 @@ var browse = function(req, res) {
 		    if (ids.length) {
 			qb.whereIn('id', ids);
 		    } else {
-			qb.limit(20)
+			qb.limit(10)
 			    .offset(offset)
 			    .orderBy('created_at', 'desc');
 		    }
