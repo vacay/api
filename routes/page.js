@@ -35,6 +35,10 @@ var browse = function(req, res) {
     var query = req.param('q') ? unescape(req.param('q')) : null;
     var ids = req.param('ids') || [];
 
+    var is_static = req.param('is_static') || undefined;
+    var orderBy = req.param('orderby') || 'created_at';
+    var direction = req.param('dir') || 'desc';
+
     async.waterfall([
 
 	function(callback) {
@@ -72,9 +76,18 @@ var browse = function(req, res) {
 		    if (ids.length) {
 			qb.whereIn('id', ids);
 		    } else {
-			qb.limit(10)
-			    .offset(offset)
-			    .orderBy('created_at', 'desc');
+			qb.limit(10).offset(offset);
+
+			if (typeof is_static !== 'undefined') qb.where('is_static', is_static);
+
+			if (orderBy === 'popular') {
+			    qb.select(db.knex.raw('count(pages_users.page_id) as subscribers'));
+			    qb.leftJoin('pages_users', 'pages.id', 'pages_users.page_id');
+			    qb.groupBy('pages_users.page_id');
+			    qb.orderBy('subscribers', direction);
+			} else {
+			    qb.orderBy(orderBy, direction);
+			}
 		    }
 		}).fetch({
 		    withRelated: [

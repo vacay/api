@@ -285,7 +285,7 @@ module.exports = function (app) {
 	     hasParams(['name', 'email', 'subject', 'body']),
 	     message.create);
 
-    app.get('/v1/page',
+    app.get('/v1/pages',
 	    isAuthenticated,
 	    page.browse);
 
