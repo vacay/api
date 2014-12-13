@@ -31,6 +31,10 @@ var load = function(req, res, next) {
 var read = function(req, res) {
     res.locals.user.fetch({
 	withRelated: [
+	    'prescriptionCount',
+	    'crateCount',
+
+	    //TODO: deprecated/remvove all this shit
 	    {
 		'prescriptions': function(qb) {
 		    qb.whereNotNull('published_at').limit(20).orderBy('prescriptions.published_at', 'desc');
