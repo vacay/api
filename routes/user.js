@@ -291,7 +291,12 @@ var browse = function(req, res) {
 			    .offset(offset)
 			    .orderBy('created_at', 'desc');
 		    }
-		}).fetch().exec(callback);
+		}).fetch({
+		    withRelated: [
+			'prescriptionCount',
+			'crateCount'
+		    ]
+		}).exec(callback);
 	}
 
     ], function(err, users) {
