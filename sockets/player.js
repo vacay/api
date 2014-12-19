@@ -109,41 +109,30 @@ module.exports = function(io, socket, redis) {
 		});
 	    }
 	});
-	
-	if (clients.length > 1) {
 
-	    socket.on('player:next', function() {
-		socket.to(user).emit('player:next');
-	    });
+ 	socket.on('player:next', function() {
+	    if (clients.length > 1) socket.to(user).emit('player:next');
+	});
 
-	    socket.on('player:play', function(data) {
-		socket.to(user).emit('player:play', data);
-	    });
+	socket.on('player:play', function(data) {
+	    if (clients.length > 1) socket.to(user).emit('player:play', data);
+	});
 
-	    socket.on('player:previous', function() {
-		socket.to(user).emit('player:previous');
-	    });
+	socket.on('player:previous', function() {
+	    if (clients.length > 1) socket.to(user).emit('player:previous');
+	});
 
-	    socket.on('player:position:update', function(data) {
-		log.debug(data);
+	socket.on('player:position:update', function(data) {
+	    if (clients.length > 1) socket.to(user).emit('player:position:update', data);
+	});
 
-		socket.to(user).emit('player:position:update', data);
-	    });
+	socket.on('player:loading:update', function(data) {
+	    if (clients.length > 1) socket.to(user).emit('player:loading:update', data);
+	});
 
-	    socket.on('player:loading:update', function(data) {
-		log.debug(data);
-
-		socket.to(user).emit('player:loading:update', data);
-	    });
-
-	    socket.on('player:time:update', function(data) {
-		log.debug(data);
-
-		socket.to(user).emit('player:time:update', data);
-	    });
-
-
-	}
+	socket.on('player:time:update', function(data) {
+	    if (clients.length > 1) socket.to(user).emit('player:time:update', data);
+	});
 
 	socket.on('player:css:update', function(data) {
 	    log.debug(data);
