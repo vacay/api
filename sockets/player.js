@@ -66,48 +66,49 @@ module.exports = function(io, socket, redis) {
 		master: master,
 		socket: socket.id
 	    });
-	});
 
-	redis.get(user + ':queue', function(err, reply) {
-	    if (err) log.error(err);
-	    else {
-		var data = JSON.parse(reply);
-		if (data) {
-		    socket.emit('queue:update', {
-			queue: data
+	    redis.get(user + ':queue', function(err, reply) {
+		if (err) log.error(err);
+		else {
+		    var data = JSON.parse(reply);
+		    if (data) {
+			socket.emit('queue:update', {
+			    queue: data
+			});
+		    }
+		}
+	    });
+
+	    redis.get(user + ':nowplaying', function(err, reply) {
+		if (err) log.error(err);
+		else {
+		    var data = JSON.parse(reply);
+		    if (data) {
+			socket.emit('player:nowplaying:update', {
+			    nowplaying: data
+			});
+		    }
+		}
+	    });
+
+	    redis.get(user + ':css', function(err, reply) {
+		if (err) log.error(err);
+		else {
+		    var data = JSON.parse(reply);
+		    if (data) socket.emit('player:css:update', data);
+		}
+	    });
+
+	    redis.get(user + ':volume', function(err, reply) {
+		if (err) log.error(err);
+		else {
+		    var data = JSON.parse(reply);
+		    if (data) socket.emit('player:volume', {
+			volume: data
 		    });
 		}
-	    }
-	});
+	    });
 
-	redis.get(user + ':nowplaying', function(err, reply) {
-	    if (err) log.error(err);
-	    else {
-		var data = JSON.parse(reply);
-		if (data) {
-		    socket.emit('player:nowplaying:update', {
-			nowplaying: data
-		    });
-		}
-	    }
-	});
-
-	redis.get(user + ':css', function(err, reply) {
-	    if (err) log.error(err);
-	    else {
-		var data = JSON.parse(reply);
-		if (data) socket.emit('player:css:update', data);
-	    }
-	});
-
-	redis.get(user + ':volume', function(err, reply) {
-	    if (err) log.error(err);
-	    else {
-		var data = JSON.parse(reply);
-		if (data) socket.emit('player:volume', {
-		    volume: data
-		});
-	    }
 	});
 
  	socket.on('player:next', function() {
