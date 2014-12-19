@@ -21,7 +21,6 @@ module.exports = function(io, socket, redis) {
 
 	    redis.set(user + ':css', JSON.stringify(data));
 	    redis.expire(user + ':css', EXPIRES);
-	    socket.to(user).emit('player:stop');
 	    socket.to(user).emit('player:css:update', data);
 	    socket.to(user).emit('player:loading:update', {
 		loading: {
@@ -39,9 +38,10 @@ module.exports = function(io, socket, redis) {
 	master = clients[0];
 
 	socket.on('set:master', function() {
-	    resetMaster();
 	    master = socket.id;
-	    socket.broadcast.to(user).emit('remote');
+	    socket.broadcast.to(user).emit('remote');	    
+	    resetMaster();
+	    socket.emit('master');
 	});
 
 	socket.on('disconnect', function() {
