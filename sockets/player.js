@@ -8,6 +8,7 @@ var EXPIRES = 604800;
 module.exports = function(io, socket, redis) {
 
     var user = socket.decoded_token.username;
+    var clients, master;
 
     socket.join(user, function(err) {
 	if (err) log.error(err);
@@ -34,9 +35,8 @@ module.exports = function(io, socket, redis) {
 	    });
 	};
 
-	var clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
-	var count = clients.length;
-	var master = clients[0];
+	clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
+	master = clients[0];
 
 	socket.on('set:master', function() {
 	    resetMaster();
@@ -98,8 +98,8 @@ module.exports = function(io, socket, redis) {
 		});
 	    }
 	});
-
-	if (count > 1) {
+	
+	if (clients.length > 1) {
 
 	    socket.on('player:next', function() {
 		socket.to(user).emit('player:next');
