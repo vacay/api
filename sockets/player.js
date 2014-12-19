@@ -21,13 +21,13 @@ module.exports = function(io, socket, redis) {
 
 	    redis.set(user + ':css', JSON.stringify(data));
 	    redis.expire(user + ':css', EXPIRES);
-	    socket.to(user).emit('player:css:update', data);
-	    socket.to(user).emit('player:loading:update', {
+	    io.to(user).emit('player:css:update', data);
+	    io.to(user).emit('player:loading:update', {
 		loading: {
 		    width: '0%'
 		}
 	    });
-	    socket.to(user).emit('player:position:update', {
+	    io.to(user).emit('player:position:update', {
 		position: {
 		    width: '0%'
 		}
@@ -54,8 +54,6 @@ module.exports = function(io, socket, redis) {
 	});
 
 	socket.on('init:player', function(data) {
-	    console.log(data);
-	    console.log(master);
 	    if (data.master && master !== socket.id) {
 		master = socket.id;
 		socket.broadcast.to(user).emit('remote');
