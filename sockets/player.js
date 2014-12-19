@@ -54,6 +54,8 @@ module.exports = function(io, socket, redis) {
 	});
 
 	socket.on('init:player', function(data) {
+	    console.log(data);
+	    console.log(master);
 	    if (data.master && master !== socket.id) {
 		master = socket.id;
 		socket.broadcast.to(user).emit('remote');
@@ -62,7 +64,7 @@ module.exports = function(io, socket, redis) {
 	    socket.emit(master === socket.id ? 'master' : 'remote', {
 		clients: clients,
 		master: master,
-		socket: socket
+		socket: socket.id
 	    });
 	});
 
