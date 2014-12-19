@@ -54,7 +54,16 @@ module.exports = function(io, socket, redis) {
 	});
 
 	socket.on('init:player', function(data) {
-	    socket.emit(master === socket.id ? 'master' : 'remote');
+	    if (data.master && master !== socket.id) {
+		master = socket.id;
+		socket.broadcast.to(user).emit('remote');
+	    }
+	    
+	    socket.emit(master === socket.id ? 'master' : 'remote', {
+		clients: clients,
+		master: master,
+		socket: socket
+	    });
 	});
 
 	redis.get(user + ':queue', function(err, reply) {
