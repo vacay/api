@@ -81,9 +81,10 @@ var browse = function(req, res) {
 			if (typeof is_static !== 'undefined') qb.where('is_static', is_static);
 
 			if (orderBy === 'popular') {
-			    qb.select(db.knex.raw('count(pages_users.page_id) as subscribers'));
-			    qb.leftJoin('pages_users', 'pages.id', 'pages_users.page_id');
-			    qb.groupBy('pages_users.page_id');
+			    qb.select(db.knex.raw('count(subscriptions.prescriber_id) as subscribers'));
+			    qb.leftJoin('subscriptions', 'pages.id', 'subscriptions.prescriber_id');
+			    qb.where('subscriptions.prescriber_type', 'pages');
+			    qb.groupBy('subscriptions.prescriber_id');
 			    qb.orderBy('subscribers', direction);
 			} else {
 			    qb.orderBy(orderBy, direction);
@@ -209,32 +210,10 @@ var vitamins = function(req, res) {
     });
 };
 
-var track = function(req, res) {
-    res.locals.page.related('users').attach(req.user.id).exec(function(err, relation) {
-	if (err) log.error(err, res.locals.logRequest(req));
-	res.status(err ? 500 : 200).send({
-	    session: req.user,
-	    data: err ? err : relation.toJSON()
-	});
-    });
-};
-
-var untrack = function(req, res) {
-    res.locals.page.related('users').detach(req.user.id).exec(function(err, relation) {
-	if (err) log.error(err, res.locals.logRequest(req));
-	res.status(err ? 500 : 200).send({
-	    session: req.user,
-	    data: err ? err : relation.toJSON()
-	});
-    });
-};
-
 module.exports = {
     load: load,
     browse: browse,
     create: create,
     read: read,
-    vitamins: vitamins,
-    track: track,
-    untrack: untrack
+    vitamins: vitamins
 };

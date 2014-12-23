@@ -3,6 +3,7 @@
 var artist = require('./artist'),
     auth = require('./auth'),
     me = require('./me'),
+    inbox = require('./inbox'),
     message = require('./message'),
     page = require('./page'),
     user = require('./user'),
@@ -93,15 +94,15 @@ module.exports = function (app) {
 	    artist.load,
 	    artist.variations);
 
-    app.post('/v1/artist/:artist/subscribe',
+    app.post('/v1/artist/:artist/subscription',
 	    isAuthenticated,
 	    artist.load,
-	    artist.subscribe);
+	    subscription.create);
 
-    app.delete('/v1/artist/:artist/subscribe',
+    app.delete('/v1/artist/:artist/subscription',
 	   isAuthenticated,
 	   artist.load,
-	   artist.unsubscribe);
+	   subscription.destroy);
 
     app.get('/v1/auth/reset',
 	    hasParams(['email']),
@@ -192,6 +193,10 @@ module.exports = function (app) {
 	    discussion.loadComment,
 	    discussion.destroyCommentVote);
 
+    app.get('/v1/groups',
+	    isAuthenticated,
+	    group.browse);
+
     app.post('/v1/group',
 	     isAuthenticated,
 	     hasParams(['name', 'description']),
@@ -233,10 +238,6 @@ module.exports = function (app) {
 	    group.load,
 	    subscription.destroy);
 
-    app.get('/v1/groups',
-	    isAuthenticated,
-	    group.browse);
-
     app.get('/v1/image',
 	    isAuthenticated,
 	    hasParams(['url']),
@@ -246,31 +247,17 @@ module.exports = function (app) {
 	    isAuthenticated,
 	    me.index);
 
-    //TODO: deprecate
-    app.get('/v1/me/crate',
-	    isAuthenticated,
-	    crate.browse);
-
-    //TODO: deprecate
-    app.get('/v1/me/tags',
-	    isAuthenticated,
-	    me.tags);
-
-    app.get('/v1/me/inbox',
-	    isAuthenticated,
-	    me.inbox);
-
     app.get('/v1/me/drafts',
 	    isAuthenticated,
 	    me.drafts);
 
-    app.get('/v1/me/pages',
+    app.get('/v1/me/inbox/prescriptions',
 	    isAuthenticated,
-	    me.pages);
+	    inbox.prescriptions);
 
-    app.get('/v1/me/tracker',
+    app.get('/v1/me/inbox/vitamins',
 	    isAuthenticated,
-	    me.tracker);
+	    inbox.vitamins);
 
     app.post('/v1/me/upload',
 	     isAuthenticated,
@@ -306,15 +293,15 @@ module.exports = function (app) {
 	    page.load,
 	    page.vitamins);
 
-    app.post('/v1/page/:page/track',
+    app.post('/v1/page/:page/subscription',
 	     isAuthenticated,
 	     page.load,
-	     page.track);
+	     subscription.create);
 
-    app.delete('/v1/page/:page/track',
+    app.delete('/v1/page/:page/subscription',
 	    isAuthenticated,
 	    page.load,
-	    page.untrack);
+	    subscription.destroy);
 
     app.get('/v1/prescriptions',
 	    isAuthenticated,
@@ -362,11 +349,6 @@ module.exports = function (app) {
 	    user.load,
 	    subscription.destroy);
 
-    app.get('/v1/user/:user/subscribers',
-	    isAuthenticated,
-	    user.load,
-	    user.subscribers);
-
     app.get('/v1/user/:user/crate',
 	    isAuthenticated,
 	    user.load,
@@ -407,10 +389,21 @@ module.exports = function (app) {
 	    vitamin.load,
 	    vitamin.read);
 
+    app.put('/v1/vitamin/:vitamin',
+	    isAuthenticated,
+	    hasParams(['title']),
+	    vitamin.load,
+	    vitamin.update);
+
     app.post('/v1/vitamin/:vitamin/crate',
 	     isAuthenticated,
 	     vitamin.load,
 	     crate.create);
+
+    app.delete('/v1/vitamin/:vitamin/crate',
+	    isAuthenticated,
+	    vitamin.load,
+	    crate.destroy);
 
     app.post('/v1/vitamin/:vitamin/tag',
 	     isAuthenticated,
@@ -418,21 +411,10 @@ module.exports = function (app) {
 	     crate.findOrCreate,
 	     tag.create);
 
-    app.delete('/v1/vitamin/:vitamin/crate',
-	    isAuthenticated,
-	    vitamin.load,
-	    crate.destroy);
-
     app.delete('/v1/vitamin/:vitamin/tag',
 	    isAuthenticated,
 	    vitamin.load,
 	    tag.destroy);
-
-    app.put('/v1/vitamin/:vitamin',
-	    isAuthenticated,
-	    hasParams(['title']),
-	    vitamin.load,
-	    vitamin.update);
 
     app.post('/v1/logger', isAuthenticated, hasParams(['error']), function(req, res) {
 	var error = req.param('error');

@@ -32,34 +32,7 @@ var read = function(req, res) {
     res.locals.user.fetch({
 	withRelated: [
 	    'prescriptionCount',
-	    'crateCount',
-
-	    //TODO: deprecated/remvove all this shit
-	    {
-		'prescriptions': function(qb) {
-		    qb.whereNotNull('published_at').limit(20).orderBy('prescriptions.published_at', 'desc');
-		}
-	    },
-	    'prescriptions.prescriber',
-	    'prescriptions.vitamins',
-	    'prescriptions.vitamins.artists',
-	    'prescriptions.vitamins.hosts',
-	    {
-		'prescriptions.vitamins.tags': function(qb) {
-		    qb.where('tags.user_id', req.user.id);
-		}
-	    },
-	    {
-		'prescriptions.vitamins.craters': function(qb) {
-		    qb.where('crates.user_id', req.user.id);
-		}
-	    },
-	    'prescriptions.users',
-	    'prescriptions.groups',
-	    'prescriptions.parent',
-	    'prescriptions.parent.prescriber',
-	    'prescriptions.children',
-	    'prescriptions.children.prescriber'
+	    'crateCount'
 	]
     }).exec(function(err, user) {
 	if (err) log.error(err, res.locals.logRequest(req));
@@ -101,26 +74,6 @@ var update = function(req, res) {
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
 	    data: err ? errorMessage : data
-	});
-    });
-};
-
-var subscribers = function(req, res) {
-    var offset = parseInt(req.param('offset'), 10) || 0;
-    res.locals.user.fetch({
-	withRelated: [
-	    {
-		'subscribers': function(qb) {
-		    //TODO: orderby probably isnt working
-		    qb.orderBy('created_at', 'desc').limit(20).offset(offset);
-		}
-	    }
-	]
-    }).exec(function(err, user) {
-	if (err) log.error(err, res.locals.logRequest(req));
-	res.status(err ? 500 : 200).send({
-	    session: req.user,
-	    data: err ? err : user.toJSON()
 	});
     });
 };
@@ -333,7 +286,6 @@ module.exports = {
     load: load,
     read: read,
     update: update,
-    subscribers: subscribers,
     prescriptions: prescriptions,
     pages: pages,
     crate: crate,
