@@ -39,6 +39,8 @@ var browse = function(req, res) {
     var orderBy = req.param('orderby') || 'created_at';
     var direction = req.param('dir') || 'desc';
 
+    var vitamins = req.param('vitamins') || undefined;
+
     async.waterfall([
 
 	function(callback) {
@@ -80,6 +82,10 @@ var browse = function(req, res) {
 
 			if (typeof is_static !== 'undefined') qb.where('is_static', is_static);
 
+			if (vitamins === 'true') {
+			    qb.innerJoin('pages_vitamins', 'pages.id', 'pages_vitamins.page_id').groupBy('pages.id');
+			}
+			
 			if (orderBy === 'popular') {
 			    qb.select(db.knex.raw('count(subscriptions.prescriber_id) as subscribers'));
 			    qb.leftJoin('subscriptions', 'pages.id', 'subscriptions.prescriber_id');
