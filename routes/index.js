@@ -251,6 +251,10 @@ module.exports = function (app) {
 	    isAuthenticated,
 	    me.drafts);
 
+    app.get('/v1/me/inbox',
+	    isAuthenticated,
+	    inbox.all);
+
     app.get('/v1/me/inbox/prescriptions',
 	    isAuthenticated,
 	    inbox.prescriptions);
