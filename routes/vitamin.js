@@ -89,10 +89,93 @@ var read = function(req, res) {
 };
 
 var update = function(req, res) {
-    db.model('Vitamin').update({
-	id: res.locals.vitamin.id,
-	title: req.param('title')
-    }).exec(function(err, vitamin) {
+    var params = {};
+
+    if (typeof req.param('title') !== 'undefined') params.title = req.param('title');
+    if (typeof req.param('original') !== 'undefined') params.original = req.param('original');
+    if (typeof req.param('variation') !== 'undefined') params.variation = req.param('variation');
+
+    params.verified_at = new Date();
+    params.verified_by = req.user.id;
+    params.id = res.locals.vitamin.id;
+
+    async.waterfall([
+	function(callback) {
+	    if (params.title && params.title.length > 100) {
+		callback('vitamin title length, ' + params.title.length + ', greater than limit of 100');
+	    } else {
+		callback();
+	    }
+	},
+
+	function(callback) {
+
+	    db.model('Vitamin').update(params).exec(callback);
+
+	},
+
+	function(vitamin, callback) {
+	    if (!req.param('original_artists') && !req.param('variation_artists') && !req.param('featured_artists')) {
+		callback(null, vitamin);
+		return;
+	    }
+
+	    var query = db.knex('artists_vitamins').where('vitamin_id', vitamin.id).del();
+
+	    query.exec(function(err) {
+		callback(err, vitamin);
+	    });
+	},
+
+	function(vitamin, callback) {
+	    if (!req.param('original_artists') && !req.param('variation_artists') && !req.param('featured_artists')) {
+		callback(null, vitamin);
+		return;
+	    }
+
+	    var original_artists = [];
+	    var featured_artists = [];
+	    var variation_artists = [];
+
+	    // lets figure this out a better way
+	    var isVariation = req.param('isVariation');
+
+	    if (req.param('original_artists')) {
+		original_artists = req.param('artists');
+		if (!Array.isArray(original_artists)) original_artists = [original_artists];
+
+		for (var i=0; i<original_artists.length; i++) {
+		    original_artists[i].type = 'Original';
+		    original_artists[i].attributed = !isVariation;
+		}
+	    }
+
+	    if (req.param('variation_artists')) {
+		variation_artists = req.param('variation_artists');
+		if (!Array.isArray(variation_artists)) variation_artists = [variation_artists];
+		for (var i=0; i<variation_artists.length; i++) {
+		    variation_artists[i].type = 'Variation';
+		    variation_artists[i].attributed = isVariation;
+		}
+	    }
+
+	    if (req.param('featured_artists')) {
+		featured_artists = req.param('featured_artists');
+		if (!Array.isArray(featured_artists)) featured_artists = [featured_artists];
+		for (var i=0; i<featured_artists.length; i++) {
+		    featured_artists[i].type = 'Featured';
+		    featured_artists[i].attributed = !isVariation;
+		}
+	    }
+
+	    var artists = original_artists.concat(variation_artists, featured_artists);
+
+	    res.locals.vitamin.related('artists').attach(artists).exec(function(err) {
+		callback(err, vitamin);
+	    });
+	}
+
+    ], function(err, vitamin) {
 	if (err) log.error(err, res.locals.logRequest(req));
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
