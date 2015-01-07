@@ -1,7 +1,8 @@
 /* global module */
 
 var config = require('config-api'),
-    log = require('log')(config.log);
+    log = require('log')(config.log),
+    db = require('db')(config);
 
 var EXPIRES = 604800;
 
@@ -9,6 +10,25 @@ module.exports = function(io, socket, redis) {
 
     var user = socket.decoded_token.username;
     var clients, master;
+
+    socket.on('join:user', function(data) {
+	var room = data.name;
+
+	// can't listen in on yourself
+	if (room === user) return;
+
+	socket.join('user:' + room, function(err) {
+	    if (err) log.error(err);
+
+	    socket.on('leave:group', function(data) {
+		if (room === data.name) {
+		    socket.leave('user:' + room, function(err) {
+			if (err) log.error(err);
+		    });
+		}
+	    });
+	});
+    });
 
     socket.join(user, function(err) {
 	if (err) log.error(err);
@@ -157,8 +177,19 @@ module.exports = function(io, socket, redis) {
 	    redis.set(user + ':nowplaying', JSON.stringify(data.nowplaying));
 	    redis.expire(user + ':nowplaying', EXPIRES);
 
+	    db.knex('listens').insert({
+		user_id: socket.decoded_token.id,
+		vitamin_id: data.nowplaying.id,
+		created_at: new Date()
+	    }).exec(function(err, listen) {
+		if (err) log.error(err);
+	    });
+
 	    socket.broadcast.emit('vitamin:play', data.nowplaying);
 	    socket.to(user).emit('player:nowplaying:update', data);
+
+	    //listen in mode
+	    socket.to('user:' + user).emit(user + ':nowplaying', data.nowplaying);
 	});
 
 	socket.on('player:volume', function(data) {
