@@ -34,7 +34,8 @@ module.exports = function(io, socket, redis) {
 
 	    // let connected sockets of this user know
 	    io.to(user).emit('joined', {
-		rooms: socket.rooms,
+		socket: socket.id,
+		clients: io.nsps['/'].adapter.rooms,
 		room: room
 	    });
 
