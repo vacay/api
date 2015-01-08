@@ -67,9 +67,9 @@ var all = function(req, res) {
 		this.where(function() {
 		    this.whereIn('prescriber_id', users).whereNull('prescriptions_users.user_id');
 		}).orWhere(function() {
-		    this.where('prescriptions_users.user_id', req.user.id);
+		    this.where('prescriptions_users.user_id', req.user.id).whereNull('parent_id');
 		}).orWhere(function() {
-		    this.whereIn('prescriptions_groups.group_id', groups);
+		    this.whereIn('prescriptions_groups.group_id', groups).whereNull('parent_id');
 		});
 	    }).whereNotNull('published_at');
 
@@ -190,9 +190,9 @@ var prescriptions = function(req, res) {
 		this.where(function() {
 		    this.whereIn('prescriber_id', users).whereNull('prescriptions_users.user_id');
 		}).orWhere(function() {
-		    this.where('prescriptions_users.user_id', req.user.id);
+		    this.where('prescriptions_users.user_id', req.user.id).whereNull('parent_id');
 		}).orWhere(function() {
-		    this.whereIn('prescriptions_groups.group_id', groups);
+		    this.whereIn('prescriptions_groups.group_id', groups).whereNull('parent_id');
 		});
 	    }).whereNotNull('published_at');
 
