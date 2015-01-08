@@ -38,7 +38,8 @@
 	"grunt": "0.4.x",
 	"grunt-contrib-jshint": "0.7.2",
 	"socket.io": "1.1.0",
-	"socketio-jwt": "2.3.5"
+	"socketio-jwt": "2.3.5",
+	"roomdata": "1.0.0"
     },
     "engines": {
 	"node": "0.10.x",

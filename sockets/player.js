@@ -2,14 +2,40 @@
 
 var config = require('config-api'),
     log = require('log')(config.log),
-    db = require('db')(config);
+    db = require('db')(config),
+    roomdata = require('roomdata');
 
 var EXPIRES = 604800;
 
 module.exports = function(io, socket, redis) {
 
     var user = socket.decoded_token.username;
-    var clients, master;
+
+    var updateMaster = function() {
+	var data = {
+	    css: 'paused',
+	    playing: false
+	};
+
+	var master = roomdata.get(socket, 'master');
+
+	redis.set(user + ':css', JSON.stringify(data));
+	redis.expire(user + ':css', EXPIRES);
+	io.to(user).emit('sync', {
+	    master: master
+	});
+	io.to(user).emit('player:css:update', data);
+	io.to(user).emit('player:loading:update', {
+	    loading: {
+		width: '0%'
+	    }
+	});
+	io.to(user).emit('player:position:update', {
+	    position: {
+		width: '0%'
+	    }
+	});
+    };
 
     socket.on('join', function(data) {
 	var room = data.room;
@@ -35,11 +61,12 @@ module.exports = function(io, socket, redis) {
 	    // let connected sockets of this user know
 	    io.to(user).emit('joined', {
 		socket: socket.id,
-		clients: io.nsps['/'].adapter.rooms,
+		clients: Object.keys(io.nsps['/'].adapter.rooms['user:' + room]),
 		room: room
 	    });
 
-	    // send current song & position to current socket
+	    //TODO: send current position
+	    // send current song
 	    redis.get(room + ':nowplaying', function(err, reply) {
 		if (err) log.error(err);
 		else {
@@ -69,68 +96,44 @@ module.exports = function(io, socket, redis) {
 
     socket.on('user:index', function(data) {
 	var room = io.nsps['/'].adapter.rooms[data.user];
-	var clients = room ? Object.keys(io.nsps['/'].adapter.rooms[data.user]) : [];
+	var sockets = room ? Object.keys(io.nsps['/'].adapter.rooms[data.user]) : [];
 
 	// send currently listening song
 	socket.emit('user:index', {
 	    user: data.user,
-	    live: clients.length > 0
+	    live: sockets.length > 0
 	});
     });
 
     socket.join(user, function(err) {
 	if (err) log.error(err);
 
-	var resetMaster = function() {
-	    var data = {
-		css: 'paused',
-		playing: false
-	    };
+	roomdata.joinRoom(socket, user);
 
-	    redis.set(user + ':css', JSON.stringify(data));
-	    redis.expire(user + ':css', EXPIRES);
-	    io.to(user).emit('player:css:update', data);
-	    io.to(user).emit('player:loading:update', {
-		loading: {
-		    width: '0%'
-		}
-	    });
-	    io.to(user).emit('player:position:update', {
-		position: {
-		    width: '0%'
-		}
-	    });
-	};
+	var master = roomdata.get(socket, 'master');
+	if (!master) master = Object.keys(io.nsps['/'].adapter.rooms[user])[0];
 
-	clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
-	master = clients[0];
+	roomdata.set(socket, 'master', master);
 
 	socket.on('set:master', function() {
 	    master = socket.id;
-	    socket.broadcast.to(user).emit('remote');
-	    resetMaster();
-	    socket.emit('master');
-	});
-
-	socket.on('disconnect', function() {
-	    if (master === socket.id) {
-		clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
-		resetMaster();
-		master = clients[0];
-		socket.to(master).emit('master');
-	    }
+	    roomdata.set(socket, 'master', master);
+	    updateMaster();
 	});
 
 	socket.on('init:player', function(data) {
 	    if (data.master && master !== socket.id) {
 		master = socket.id;
-		socket.broadcast.to(user).emit('remote');
+		roomdata.set(socket, 'master', master);
+		updateMaster();
 	    }
 
-	    socket.emit(master === socket.id ? 'master' : 'remote', {
+	    var clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
+
+	    socket.emit('init', {
+		socket: socket.id,
 		clients: clients,
 		master: master,
-		socket: socket.id,
 		rooms: socket.rooms
 	    });
 
@@ -179,27 +182,27 @@ module.exports = function(io, socket, redis) {
 	});
 
  	socket.on('player:next', function() {
-	    if (clients.length > 1) socket.to(user).emit('player:next');
+	    if (Object.keys(io.nsps['/'].adapter.rooms[user]).length > 1) socket.to(user).emit('player:next');
 	});
 
 	socket.on('player:play', function(data) {
-	    if (clients.length > 1) socket.to(user).emit('player:play', data);
+	    if (Object.keys(io.nsps['/'].adapter.rooms[user]).length > 1) socket.to(user).emit('player:play', data);
 	});
 
 	socket.on('player:previous', function() {
-	    if (clients.length > 1) socket.to(user).emit('player:previous');
+	    if (Object.keys(io.nsps['/'].adapter.rooms[user]).length > 1) socket.to(user).emit('player:previous');
 	});
 
 	socket.on('player:position:update', function(data) {
-	    if (clients.length > 1) socket.to(user).emit('player:position:update', data);
+	    if (Object.keys(io.nsps['/'].adapter.rooms[user]).length > 1) socket.to(user).emit('player:position:update', data);
 	});
 
 	socket.on('player:loading:update', function(data) {
-	    if (clients.length > 1) socket.to(user).emit('player:loading:update', data);
+	    if (Object.keys(io.nsps['/'].adapter.rooms[user]).length > 1) socket.to(user).emit('player:loading:update', data);
 	});
 
 	socket.on('player:time:update', function(data) {
-	    if (clients.length > 1) socket.to(user).emit('player:time:update', data);
+	    if (Object.keys(io.nsps['/'].adapter.rooms[user]).length > 1) socket.to(user).emit('player:time:update', data);
 	});
 
 	socket.on('player:css:update', function(data) {
@@ -251,5 +254,17 @@ module.exports = function(io, socket, redis) {
 	    socket.to(user).emit('player:volume', data);
 	});
 
+    });
+
+    socket.on('disconnect', function() {
+	var master = roomdata.get(socket, 'master');
+
+	if (master === socket.id) {
+	    var clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
+	    master = clients[0];
+	    roomdata.set(socket, 'master', master);
+	    updateMaster();
+	}
+	roomdata.leaveRoom(socket);
     });
 };
