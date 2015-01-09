@@ -37,6 +37,16 @@ module.exports = function(io, socket, redis, queue, users) {
 	});
     };
 
+    var leaveRoom = function(name) {
+	// remove all clients of user
+	Object.keys(io.nsps['/'].adapter.rooms[user]).forEach(function(s) {
+	    io.sockets.connected[s].leave('user:' + name);
+	});
+
+	// infrom all clients of user about leaving
+	io.to(user).emit('left');
+    };
+
     socket.on('join', function(data) {
 	var room = data.room;
 
@@ -46,11 +56,8 @@ module.exports = function(io, socket, redis, queue, users) {
 	// can't listen in on an a non live user
 	if (!Object.keys(io.nsps['/'].adapter.rooms[room]).length) return;
 
-	if (socket.rooms.length > 2 ) {
-	    //TODO: remove user from 3rd room and carry on - broadcast to other clients of user
-	    log.error('socket is in too many rooms');
-	    return;
-	}
+	// if in another room - remove first
+	if (socket.rooms.length > 2 ) leaveRoom(socket.rooms[2]);
 
 	// remove from live users
 	var length = users.length;
@@ -87,16 +94,7 @@ module.exports = function(io, socket, redis, queue, users) {
 	});
 
 	socket.on('leave', function(data) {
-	    if (room === data.room) {
-
-		// remove all clients of user
-		Object.keys(io.nsps['/'].adapter.rooms[user]).forEach(function(s) {
-		    io.sockets.connected[s].leave('user:' + room);
-		});
-
-		// infrom all clients of user about leaving
-		io.to(user).emit('left');
-	    }
+	    if (room === data.room) leaveRoom(room);
 	});
     });
 
