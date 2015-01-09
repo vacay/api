@@ -25,12 +25,14 @@ module.exports = function(io, queue, redis) {
 
 	if (!listeners.length) return;
 
+	var users = [];
+
 	io.on('connection', function(socket) {
 
 	    log.debug('successful socket connection to', socket.decoded_token.username);
 
 	    listeners.forEach(function(listener) {
-		listener(io, socket, redis, queue);
+		listener(io, socket, redis, queue, users);
 	    });
 	});
     });

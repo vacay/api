@@ -7,7 +7,7 @@ var config = require('config-api'),
 
 var EXPIRES = 604800;
 
-module.exports = function(io, socket, redis) {
+module.exports = function(io, socket, redis, queue, users) {
 
     var user = socket.decoded_token.username;
 
@@ -52,56 +52,51 @@ module.exports = function(io, socket, redis) {
 	    return;
 	}
 
-	socket.join('user:' + room, function(err) {
-	    if (err) {
-		log.error(err);
-		return;
-	    }
+	// remove from live users
+	var length = users.length;
+	users = users.filter(function (obj) {
+	    return obj.username !== user;
+	});
+	if (users.length !== length) io.emit('users', users);
 
-	    // let connected sockets of this user know
-	    io.to(user).emit('joined', {
-		socket: socket.id,
-		clients: Object.keys(io.nsps['/'].adapter.rooms['user:' + room]),
-		room: room
-	    });
+	// add all clients of user to room
+	Object.keys(io.nsps['/'].adapter.rooms[user]).forEach(function(s){
+	    io.sockets.connected[s].join('user:' + room);
+	});
 
-	    //TODO: send current position
-	    // send current song
-	    redis.get(room + ':nowplaying', function(err, reply) {
-		if (err) log.error(err);
-		else {
-		    var data = JSON.parse(reply);
-		    if (data) socket.emit('room:nowplaying', {
+	// inform all clients of user about joining
+	io.to(user).emit('joined', {
+	    socket: socket.id,
+	    clients: Object.keys(io.nsps['/'].adapter.rooms['user:' + room]),
+	    room: room
+	});
+
+	//TODO: send current position
+	// send current song to all clients of user
+	redis.get(room + ':nowplaying', function(err, reply) {
+	    if (err) log.error(err);
+	    else {
+		var data = JSON.parse(reply);
+		if (data) {
+		    io.to(user).emit('room:nowplaying', {
 			vitamin: data,
 			room: room
 		    });
 		}
-	    });
-
-	    socket.on('leave', function(data) {
-		if (room === data.room) {
-		    socket.leave('user:' + room, function(err) {
-			if (err) log.error(err);
-
-			//let connected sockets of this user know
-			io.to(user).emit('left', {
-			    rooms: socket.rooms,
-			    room: room
-			});
-		    });
-		}
-	    });
+	    }
 	});
-    });
 
-    socket.on('user:index', function(data) {
-	var room = io.nsps['/'].adapter.rooms[data.user];
-	var sockets = room ? Object.keys(io.nsps['/'].adapter.rooms[data.user]) : [];
+	socket.on('leave', function(data) {
+	    if (room === data.room) {
 
-	// send currently listening song
-	socket.emit('user:index', {
-	    user: data.user,
-	    live: sockets.length > 0
+		// remove all clients of user
+		Object.keys(io.nsps['/'].adapter.rooms[user]).forEach(function(s) {
+		    io.sockets.connected[s].leave('user:' + room);
+		});
+
+		// infrom all clients of user about leaving
+		io.to(user).emit('left');
+	    }
 	});
     });
 
@@ -134,7 +129,8 @@ module.exports = function(io, socket, redis) {
 		socket: socket.id,
 		clients: clients,
 		master: master,
-		rooms: socket.rooms
+		rooms: socket.rooms,
+		users: users
 	    });
 
 	    redis.get(user + ':queue', function(err, reply) {
@@ -224,7 +220,6 @@ module.exports = function(io, socket, redis) {
 	});
 
 	socket.on('player:nowplaying:update', function(data) {
-	    log.debug(data);
 
 	    redis.set(user + ':nowplaying', JSON.stringify(data.nowplaying));
 	    redis.expire(user + ':nowplaying', EXPIRES);
@@ -238,13 +233,24 @@ module.exports = function(io, socket, redis) {
 	    });
 
 	    socket.broadcast.emit('vitamin:play', data.nowplaying);
-	    socket.to(user).emit('player:nowplaying:update', data);
+	    socket.to(user).emit('player:nowplaying:update', {
+		nowplaying: data.nowplaying
+	    });
 
 	    //listen in mode
 	    socket.to('user:' + user).emit('room:nowplaying', {
 		vitamin: data.nowplaying,
 		room: user
 	    });
+
+	    var obj = users.filter(function(obj) {
+		return obj.username === user;
+	    })[0];
+
+	    if (!obj && !data.room) {
+		users.push(data.user);
+		io.emit('users', users);
+	    }
 	});
 
 	socket.on('player:volume', function(data) {
@@ -259,12 +265,30 @@ module.exports = function(io, socket, redis) {
     socket.on('disconnect', function() {
 	var master = roomdata.get(socket, 'master');
 
-	if (master === socket.id) {
+	if (master === socket.id && io.nsps['/'].adapter.rooms[user]) {
 	    var clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
 	    master = clients[0];
 	    roomdata.set(socket, 'master', master);
 	    updateMaster();
 	}
+
 	roomdata.leaveRoom(socket);
+
+	var length = users.length;
+	users = users.filter(function (obj) {
+	    return obj.username !== user;
+	});
+
+	if (users.length !== length) {
+	    io.emit('users', users);
+
+	    io.to('user:' + user).emit('left');
+	    var room = io.nsps['/'].adapter.rooms['user:' + user];
+	    if (room) {
+		Object.keys(room).forEach(function(s){
+		    io.sockets.connected[s].leave('user:' + user);
+		});
+	    }
+	}
     });
 };
