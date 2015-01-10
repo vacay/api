@@ -48,6 +48,9 @@ module.exports = function(io, socket, redis, queue, users) {
     };
 
     var leaveRoom = function(name) {
+
+	roomdata.set(socket, 'user', null);
+
 	// remove all clients of user
 	Object.keys(io.nsps['/'].adapter.rooms[user]).forEach(function(s) {
 	    io.sockets.connected[s].leave('user:' + name);
@@ -75,6 +78,8 @@ module.exports = function(io, socket, redis, queue, users) {
 	    users.splice(idx, 1);
 	    io.emit('users', users);
 	}
+
+	roomdata.set(socket, 'user', room);
 
 	// add all clients of user to room
 	Object.keys(io.nsps['/'].adapter.rooms[user]).forEach(function(s){
@@ -138,7 +143,8 @@ module.exports = function(io, socket, redis, queue, users) {
 		clients: clients,
 		master: master,
 		rooms: socket.rooms,
-		users: users
+		users: users,
+		room: roomdata.get(socket, 'user')
 	    });
 
 	    redis.get(user + ':queue', function(err, reply) {
