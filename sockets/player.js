@@ -279,8 +279,10 @@ module.exports = function(io, socket, redis, queue, users) {
     socket.on('disconnect', function() {
 	var master = roomdata.get(socket, 'master');
 
-	if (master === socket.id && io.nsps['/'].adapter.rooms[user]) {
-	    var clients = Object.keys(io.nsps['/'].adapter.rooms[user]);
+	var userRoom = io.nsps['/'].adapter.rooms[user];
+
+	if (master === socket.id && userRoom) {
+	    var clients = Object.keys(userRoom);
 	    master = clients[0];
 	    roomdata.set(socket, 'master', master);
 	    updateMaster();
@@ -288,12 +290,15 @@ module.exports = function(io, socket, redis, queue, users) {
 
 	roomdata.leaveRoom(socket);
 
+	// if there are no other clients of user connected - stop others from listening in
 	var idx = findWithAttr(users, 'username', user);
-	if (idx !== -1) {
+	if (idx !== -1 && !userRoom) {
 
+	    // remove from live users list
 	    users.splice(idx, 1);
 	    io.emit('users', users);
 
+	    // kick everyone out of the room
 	    io.to('user:' + user).emit('left');
 	    var room = io.nsps['/'].adapter.rooms['user:' + user];
 	    if (room) {
