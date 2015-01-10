@@ -7,6 +7,16 @@ var config = require('config-api'),
 
 var EXPIRES = 604800;
 
+var findWithAttr = function(array, attr, value) {
+    for(var i = 0; i < array.length; i += 1) {
+        if(array[i][attr] === value) {
+            return i;
+        }
+    }
+
+    return -1;
+};
+
 module.exports = function(io, socket, redis, queue, users) {
 
     var user = socket.decoded_token.username;
@@ -60,11 +70,11 @@ module.exports = function(io, socket, redis, queue, users) {
 	if (socket.rooms.length > 2 ) leaveRoom(socket.rooms[2]);
 
 	// remove from live users
-	var length = users.length;
-	users = users.filter(function (obj) {
-	    return obj.username !== user;
-	});
-	if (users.length !== length) io.emit('users', users);
+	var idx = findWithAttr(users, 'username', user);
+	if (idx !== -1) {
+	    users.splice(idx, 1);
+	    io.emit('users', users);
+	}
 
 	// add all clients of user to room
 	Object.keys(io.nsps['/'].adapter.rooms[user]).forEach(function(s){
@@ -245,7 +255,7 @@ module.exports = function(io, socket, redis, queue, users) {
 		return obj.username === user;
 	    })[0];
 
-	    if (!obj && !data.room) {
+	    if (!obj && !data.room && data.user) {
 		users.push(data.user);
 		io.emit('users', users);
 	    }
@@ -272,12 +282,10 @@ module.exports = function(io, socket, redis, queue, users) {
 
 	roomdata.leaveRoom(socket);
 
-	var length = users.length;
-	users = users.filter(function (obj) {
-	    return obj.username !== user;
-	});
+	var idx = findWithAttr(users, 'username', user);
+	if (idx !== -1) {
 
-	if (users.length !== length) {
+	    users.splice(idx, 1);
 	    io.emit('users', users);
 
 	    io.to('user:' + user).emit('left');
