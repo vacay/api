@@ -4,7 +4,8 @@ var config = require('config-api'),
     log = require('log')(config.log),
     db = require('db')(config),
     utils = require('../lib/utils'),
-    async = require('async');
+    async = require('async'),
+    jwt = require('jsonwebtoken');
 
 var load = function(req, res, next) {
     db.model('User').findOne({
@@ -55,21 +56,32 @@ var update = function(req, res) {
     if (typeof req.param('bio') !== 'undefined') params.bio = req.param('bio');
     if (typeof req.param('location') !== 'undefined') params.location = req.param('location');
     if (typeof req.param('avatar') !== 'undefined') params.avatar = req.param('avatar');
+    if (typeof req.param('username') !== 'undefined') params.username = req.param('username');
 
     params.id = res.locals.user.id;
 
     db.model('User').edit(params).exec(function(err, user) {
 	var errorMessage, data;
 	if (err) {
-	    if (err.clientError && err.clientError.message.indexOf('ER_DUP_ENTRY') !== -1) {
-		errorMessage = 'Email address is already taken';
-	    } else {
-		log.error(err, res.locals.logRequest(req));
-		errorMessage = 'Failed to save update';
+	    if (err.message && err.message.indexOf('ER_DUP_ENTRY') !== -1) {
+		if (err.message.indexOf('users_email_unique') !== -1) errorMessage = 'Email address is taken';
+		if (err.message.indexOf('users_username_unique') !== -1) errorMessage = 'Username is taken';
 	    }
+
+	    if (!errorMessage) errorMessage = 'Failed to save update';
 	} else {
 	    data = user.toJSON();
 	    data.email = user.attributes.email;
+
+	    // if username is updated
+	    // - we need to update api session
+	    // - send a new token
+	    // - update websocket session
+	    // - update websocket rooms
+	    if (data.username) {
+		req.user.username = data.username;
+		var token = jwt.sign(req.user, config.session.secret, {expiresInMinutes: config.session.expires});
+	    }
 	}
 	res.status(err ? 500 : 200).send({
 	    session: req.user,
@@ -81,7 +93,6 @@ var update = function(req, res) {
 var prescriptions = function(req, res) {
     var offset = parseInt(req.param('offset'), 10) || 0;
     var query = req.param('q') ? unescape(req.param('q')) : null;
-
 
     res.locals.user.prescriptions().query(function(qb) {
 	if (query) {
