@@ -16,7 +16,7 @@
     "body-parser": "1.9.0",
     "compression": "1.2.0",
     "config-api": "file:config",
-    "db": "https://api.github.com/repos/vacay/db/tarball/0.10.10",
+    "db": "https://api.github.com/repos/vacay/db/tarball/0.10.11",
     "elasticsearch": "11.0.1",
     "express": "4.9.8",
     "grunt": "0.4.x",

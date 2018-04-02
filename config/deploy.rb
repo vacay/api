@@ -14,6 +14,7 @@ set :chef_cookbooks_path, 'kitchen/cookbooks'
 set :chef_data_bags_path, 'kitchen/data_bags'
 set :chef_roles_path, 'kitchen/roles'
 set :chef_nodes_path, 'kitchen/nodes'
+set :chef_environments_path, 'kitchen/environment'
 
 set :application, 'vacay'
 set :repo_url, 'git@github.com:vacay/api.git'
