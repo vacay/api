@@ -27,32 +27,120 @@ set :keep_releases, 2
 
 set :use_sudo, true
 
-namespace :forever do
-  desc 'Install forever globally'
+set :pm2_app_process, 'process.json'
+set :pm2_app_name, 'api'
+set :pm2_env_variables, {}
+
+namespace :pm2 do
+  desc 'Install pm2 & logrotate'
   task :setup do
     on roles(:api), in: :parallel do
-      execute "sudo npm install -g forever"
+      execute "sudo npm install pm2 -g"
+      execute "sudo pm2 logrotate -u deploy"
+      execute "sudo pm2 set pm2-logrotate:retain 50"
     end
   end
 
-  desc 'Stop node script'
-  task :stop do
+  desc 'Restart app gracefully'
+  task :restart do
     on roles(:api), in: :parallel do
-      execute "sudo forever stop #{current_path}/app.js --killSignal=SIGTERM; true"
+      case app_status
+      when nil
+        info 'App is not registerd'
+        invoke 'pm2:start'
+      when 'stopped'
+        info 'App is stopped'
+        restart_app
+      when 'errored'
+        info 'App has errored'
+        restart_app
+      when 'online'
+        info 'App is online'
+        restart_app
+      end
     end
   end
 
-  desc 'Start node script'
+  after 'deploy:published', 'pm2:restart'
+
+  desc 'List all pm2 applications'
+  task :status do
+    run_task :pm2, :list
+  end
+
+  desc 'Start pm2 application'
   task :start do
-    on roles(:api), in: :parallel do |host|
-      execute "sudo NODE_ENV=production forever start -s #{current_path}/app.js"
+    run_task :pm2, :start, fetch(:pm2_app_process)
+  end
+
+  desc 'Stop pm2 application'
+  task :stop do
+    run_task :pm2, :stop, app_name
+  end
+
+  desc 'Delete pm2 application'
+  task :delete do
+    run_task :pm2, :delete, app_name
+  end
+
+  desc 'Show pm2 application info'
+  task :list do
+    run_task :pm2, :show, app_name
+  end
+
+  desc 'Watch pm2 logs'
+  task :logs do
+    run_task :pm2, :logs
+  end
+
+  desc 'Reset pm2 meta data'
+  task :reset do
+    run_task :pm2, :reset, app_name
+  end
+
+  desc 'Save pm2 state so it can be loaded after restart'
+  task :save do
+    run_task :pm2, :save
+  end
+
+  desc 'Reload pm2 Logs'
+  task :reloadLogs do
+    run_task :pm2, :reloadLogs
+  end
+
+  def app_name
+    fetch(:pm2_app_name)
+  end
+
+  def app_status
+    within current_path do
+      ps = JSON.parse(capture :pm2, :jlist, :'-s')
+
+      # find the process with our app name
+      ps.each do |child|
+        if child['name'] == app_name
+          # status: online, errored, stopped
+          return child['pm2_env']['status']
+        end
+      end
+
+      return nil
     end
   end
 
-  desc 'Clean forever logs'
-  task :cleanlogs do
+  def restart_app
+    within current_path do
+      execute :pm2, :restart, app_name
+    end
+  end
+
+  def run_task(*args)
     on roles(:api), in: :parallel do
-      execute "sudo forever cleanlogs"
+      within fetch(:pm2_target_path, current_path) do
+        with fetch(:pm2_env_variables) do
+          execute *args
+        end
+      end
     end
   end
 end
@@ -72,17 +160,6 @@ namespace :npm do
       execute "cd #{release_path}/ && sudo npm install --production"
     end
   end
-end
-
-namespace :deploy do
-  after :updated, 'npm:symlink'
-  after :updated, 'npm:install'
-
-  desc 'Restart node script'
-  after :publishing, :restart do
-    invoke 'forever:stop'
-    invoke 'forever:cleanlogs'
-    sleep 3
-    invoke 'forever:start'
-  end
+  after 'deploy:updated', 'npm:symlink'
+  after 'deploy:updated', 'npm:install'
 end
